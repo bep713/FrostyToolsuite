@@ -979,7 +979,7 @@ namespace FrostyCmd
                 writer.Write((int)(int)ProfileVersion.Madden22);
                 writer.WriteObfuscatedString("madden22");
                 writer.WriteObfuscatedString(typeof(NullDeobfuscator).Name);
-                writer.WriteObfuscatedString(AssetManager.GetLoaderName("FifaAssetLoader"));
+                writer.WriteObfuscatedString(AssetManager.GetLoaderName("Madden22AssetLoader"));
                 writer.Write(CreateSources("Patch;false", "Data;false"));
                 writer.WriteObfuscatedString("MADDEN22SDK");
                 writer.Write(CreateBanner("MADDEN22"));
@@ -991,7 +991,7 @@ namespace FrostyCmd
                 writer.Write(0); // ignored res types
 
                 // Flags (MustAddChunks, EbxVersion, RequiresKey)
-                ProfileFlags pf = new ProfileFlags(0, 4, 0);
+                ProfileFlags pf = new ProfileFlags(0, 5, 1);
                 pf.Write(writer);
 
                 blobs.Add(key, writer.ToByteArray());

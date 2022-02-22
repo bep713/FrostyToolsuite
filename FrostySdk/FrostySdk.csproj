@@ -112,6 +112,7 @@
     <Compile Include="Managers\KeyManager.cs" />
     <Compile Include="Managers\Loaders\EdgeAssetLoader.cs" />
     <Compile Include="Managers\Loaders\AnthemAssetLoader.cs" />
+    <Compile Include="Managers\Loaders\Madden22AssetLoader.cs" />
     <Compile Include="Managers\Loaders\PVZAssetLoader.cs" />
     <Compile Include="Managers\Loaders\FifaAssetLoader.cs" />
     <Compile Include="Managers\Loaders\LegacyAssetLoader.cs" />

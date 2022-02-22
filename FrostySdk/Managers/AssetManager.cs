@@ -2358,7 +2358,8 @@ namespace FrostySdk.Managers
                 { "FifaAssetLoader", typeof(FifaAssetLoader) },
                 { "EdgeAssetLoader", typeof(EdgeAssetLoader) },
                 { "AnthemAssetLoader", typeof(AnthemAssetLoader) },
-                { "PVZAssetLoader", typeof(PVZAssetLoader) }
+                { "PVZAssetLoader", typeof(PVZAssetLoader) },
+                { "Madden22AssetLoader", typeof(Madden22AssetLoader) }
             };
 
             return loaderTypes[name].Name;
