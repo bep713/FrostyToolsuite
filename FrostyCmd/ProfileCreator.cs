@@ -970,6 +970,34 @@ namespace FrostyCmd
             }
         }
 
+        private void CreateMadden22Profile()
+        {
+            string key = "Madden22";
+            using (NativeWriter writer = new NativeWriter(new MemoryStream()))
+            {
+                writer.WriteObfuscatedString("Madden NFL 22™");
+                writer.Write((int)(int)ProfileVersion.Madden22);
+                writer.WriteObfuscatedString("madden22");
+                writer.WriteObfuscatedString(typeof(NullDeobfuscator).Name);
+                writer.WriteObfuscatedString(AssetManager.GetLoaderName("FifaAssetLoader"));
+                writer.Write(CreateSources("Patch;false", "Data;false"));
+                writer.WriteObfuscatedString("MADDEN22SDK");
+                writer.Write(CreateBanner("MADDEN22"));
+                writer.WriteObfuscatedString("Longshot/Common/Debug_Grey");
+                writer.WriteObfuscatedString("content/common/textures/debug/debug_texture_norm");
+                writer.WriteObfuscatedString("content/Common/textures/debug/debug_texture_coeff");
+                writer.WriteObfuscatedString("Longshot/Common/Debug_Grey");
+                writer.Write(0); // shared bundle names
+                writer.Write(0); // ignored res types
+
+                // Flags (MustAddChunks, EbxVersion, RequiresKey)
+                ProfileFlags pf = new ProfileFlags(0, 4, 0);
+                pf.Write(writer);
+
+                blobs.Add(key, writer.ToByteArray());
+            }
+        }
+
         public ProfileCreator()
         {
         }
@@ -1004,7 +1032,9 @@ namespace FrostyCmd
 #if FROSTY_DEVELOPER
 
             CreateNFSEdgeProfile();
-            
+            CreateMadden22Profile();
+
+
 #endif
 
             using (NativeWriter writer = new NativeWriter(new FileStream(@"..\..\..\..\FrostySdk\Profiles.bin", FileMode.Create)))

@@ -39,7 +39,8 @@ namespace FrostySdk
         PlantsVsZombiesBattleforNeighborville = 20190905,
         Fifa20 = 20190911,
         NeedForSpeedHeat = 20191101,
-        StarWarsSquadrons = 20201001
+        StarWarsSquadrons = 20201001,
+        Madden22 = 20220222
     }
 
     public struct Profile
