@@ -132,6 +132,12 @@ namespace Frosty.Core.Sdk.Madden20
             long thisOffset = reader.Position;
 
             long typeInfoOffset = reader.ReadLong();
+
+            if (ProfilesLibrary.DataVersion == (int)ProfileVersion.Madden22)
+            {
+                reader.Position += 8;
+            }
+
             ClassesSdkCreator.offset = reader.ReadLong();
             Guid guid = Guid.Empty;
 
