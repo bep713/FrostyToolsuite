@@ -14,7 +14,7 @@ namespace FrostySdk.IO
 
         public uint TotalCount { get => binarySbReader.TotalCount; }
 
-        private IBinarySbReader binarySbReader;
+        public IBinarySbReader binarySbReader { get; }
 
         private bool containsUncompressedData;
         private readonly long bundleOffset;

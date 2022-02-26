@@ -12,6 +12,7 @@ namespace FrostySdk.BaseProfile
     public class BaseBinarySbReader : IBinarySbReader
     {
         public uint TotalCount { get => totalCount; }
+        public Endian Endian { get; set; } = Endian.Big;
 
         private uint totalCount;
 
@@ -22,24 +23,22 @@ namespace FrostySdk.BaseProfile
         private uint metaOffset;
         private uint metaSize;
 
-        private Endian endian = Endian.Big;
-
         private List<Sha1> sha1 = new List<Sha1>();
 
         public DbObject ReadDbObject(DbReader reader, bool containsUncompressedData, long bundleOffset)
         {
             uint dataOffset = reader.ReadUInt(Endian.Big) + 4;
-            uint magic = reader.ReadUInt(endian) ^ 0x7065636E;
+            uint magic = reader.ReadUInt(Endian) ^ 0x7065636E;
 
             bool containsSha1 = !(magic == 0xC3889333 || magic == 0xC3E5D5C3);
 
-            totalCount = reader.ReadUInt(endian);
-            ebxCount = reader.ReadUInt(endian);
-            resCount = reader.ReadUInt(endian);
-            chunkCount = reader.ReadUInt(endian);
-            stringsOffset = reader.ReadUInt(endian) - 0x24;
-            metaOffset = reader.ReadUInt(endian) - 0x24;
-            metaSize = reader.ReadUInt(endian);
+            totalCount = reader.ReadUInt(Endian);
+            ebxCount = reader.ReadUInt(Endian);
+            resCount = reader.ReadUInt(Endian);
+            chunkCount = reader.ReadUInt(Endian);
+            stringsOffset = reader.ReadUInt(Endian) - 0x24;
+            metaOffset = reader.ReadUInt(Endian) - 0x24;
+            metaSize = reader.ReadUInt(Endian);
 
             byte[] buffer = (ProfilesLibrary.DataVersion == (int)ProfileVersion.Anthem
                              || ProfilesLibrary.DataVersion == (int)ProfileVersion.PlantsVsZombiesBattleforNeighborville
@@ -159,8 +158,8 @@ namespace FrostySdk.BaseProfile
             {
                 DbObject entry = new DbObject(new Dictionary<string, object>());
 
-                uint nameOffset = reader.ReadUInt(endian);
-                uint originalSize = reader.ReadUInt(endian);
+                uint nameOffset = reader.ReadUInt(Endian);
+                uint originalSize = reader.ReadUInt(Endian);
 
                 long currentPos = reader.Position;
                 reader.Position = 4 + stringsOffset + nameOffset;
@@ -186,8 +185,8 @@ namespace FrostySdk.BaseProfile
             {
                 DbObject entry = new DbObject(new Dictionary<string, object>());
 
-                uint nameOffset = reader.ReadUInt(endian);
-                uint originalSize = reader.ReadUInt(endian);
+                uint nameOffset = reader.ReadUInt(Endian);
+                uint originalSize = reader.ReadUInt(Endian);
 
                 long currentPos = reader.Position;
                 reader.Position = 4 + stringsOffset + nameOffset;
@@ -202,13 +201,13 @@ namespace FrostySdk.BaseProfile
             }
 
             foreach (DbObject res in resList)
-                res.AddValue("resType", reader.ReadUInt(Endian.Big));
+                res.AddValue("resType", reader.ReadUInt(Endian));
 
             foreach (DbObject res in resList)
                 res.AddValue("resMeta", reader.ReadBytes(0x10));
 
             foreach (DbObject res in resList)
-                res.AddValue("resRid", reader.ReadLong(Endian.Big));
+                res.AddValue("resRid", reader.ReadLong(Endian));
 
             return resList;
         }
@@ -222,9 +221,9 @@ namespace FrostySdk.BaseProfile
             {
                 DbObject entry = new DbObject(new Dictionary<string, object>());
 
-                Guid chunkId = reader.ReadGuid(endian);
-                uint logicalOffset = reader.ReadUInt(endian);
-                uint logicalSize = reader.ReadUInt(endian);
+                Guid chunkId = reader.ReadGuid(Endian);
+                uint logicalOffset = reader.ReadUInt(Endian);
+                uint logicalSize = reader.ReadUInt(Endian);
                 long originalSize = (logicalOffset & 0xFFFF) | logicalSize;
 
                 entry.AddValue("id", chunkId);

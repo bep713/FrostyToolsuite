@@ -19,6 +19,11 @@ namespace FrostySdk.Interfaces
         uint TotalCount { get; }
 
         /// <summary>
+        /// Sets which endian to use when reading the data.
+        /// </summary>
+        Endian Endian { get; set; }
+
+        /// <summary>
         /// Parses a bundle and creates a DbObject containing the bundle's ebx, chunk, and res data.
         /// </summary>
         /// <param name="reader">A <see cref="DbReader"/> that will parse the bundle.</param>

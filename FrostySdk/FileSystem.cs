@@ -409,6 +409,7 @@ namespace FrostySdk
                         // FIFA19 - Doesnt have Cat files
                         if ((!installChunk.HasValue("files") || installChunk.GetValue<DbObject>("files").Count == 0) && (ProfilesLibrary.DataVersion != (int)ProfileVersion.Anthem
                             && ProfilesLibrary.DataVersion != (int)ProfileVersion.PlantsVsZombiesBattleforNeighborville && ProfilesLibrary.DataVersion != (int)ProfileVersion.NeedForSpeedHeat
+                            && ProfilesLibrary.DataVersion != (int)ProfileVersion.Madden22
                             ))
                         {
                             // BFV needs even non existent catalogs to be in the list for indexing to work
