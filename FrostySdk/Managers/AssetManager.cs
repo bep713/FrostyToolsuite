@@ -634,7 +634,8 @@ namespace FrostySdk.Managers
                 foreach (ICustomAssetManager manager in customAssetManagers.Values)
                     manager.Initialize(logger);
 
-                if (result != null && ProfilesLibrary.DataVersion != (int)ProfileVersion.Fifa19 && ProfilesLibrary.DataVersion != (int)ProfileVersion.Madden20 && ProfilesLibrary.DataVersion != (int)ProfileVersion.Fifa20)
+                if (result != null && ProfilesLibrary.DataVersion != (int)ProfileVersion.Fifa19 && ProfilesLibrary.DataVersion != (int)ProfileVersion.Madden20 && ProfilesLibrary.DataVersion != (int)ProfileVersion.Fifa20
+                    && ProfilesLibrary.DataVersion != (int)ProfileVersion.Madden22)
                 {
                     result.InvalidatedDueToPatch = prePatchCache != null;
                     if (prePatchCache != null)
@@ -687,7 +688,7 @@ namespace FrostySdk.Managers
                 }
 
                 if (ProfilesLibrary.DataVersion == (int)ProfileVersion.Fifa19 || ProfilesLibrary.DataVersion == (int)ProfileVersion.Anthem || ProfilesLibrary.DataVersion == (int)ProfileVersion.Madden20 || ProfilesLibrary.DataVersion == (int)ProfileVersion.Fifa20 || ProfilesLibrary.DataVersion == (int)ProfileVersion.NeedForSpeedHeat
-                 || ProfilesLibrary.DataVersion == (int)ProfileVersion.PlantsVsZombiesBattleforNeighborville
+                 || ProfilesLibrary.DataVersion == (int)ProfileVersion.PlantsVsZombiesBattleforNeighborville || ProfilesLibrary.DataVersion == (int)ProfileVersion.Madden22
                     )
                 {
                     // load class infos
