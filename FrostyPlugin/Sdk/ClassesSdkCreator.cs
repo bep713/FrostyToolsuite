@@ -1510,10 +1510,10 @@ namespace Frosty.Core.Sdk
                     EbxClass ebxClass = new EbxClass
                     {
                         Name = classObj.GetValue("name", ""),
-                        FieldCount = (byte)theClass.FieldCount,
+                        FieldCount = theClass.FieldCount,
                         Alignment = theClass.Alignment,
-                        Size = (ushort)(theClass.Size),
-                        Type = (ushort)(theClass.Type >> 1),
+                        Size = theClass.Size,
+                        Type = theClass.Type,
                         SecondSize = (ushort)classObj.GetValue<int>("size")
                     };                 
 
@@ -1677,7 +1677,8 @@ namespace Frosty.Core.Sdk
                     fieldObj.AddValue("name", field.Name);
                     fieldObj.AddValue("type", (int)field.DebugType);
                     fieldObj.AddValue("flags", (int)field.Type);
-                    if (ProfilesLibrary.DataVersion == (int)ProfileVersion.Anthem || ProfilesLibrary.DataVersion == (int)ProfileVersion.PlantsVsZombiesBattleforNeighborville || ProfilesLibrary.DataVersion == (int)ProfileVersion.Fifa20)
+                    if (ProfilesLibrary.DataVersion == (int)ProfileVersion.Anthem || ProfilesLibrary.DataVersion == (int)ProfileVersion.PlantsVsZombiesBattleforNeighborville || ProfilesLibrary.DataVersion == (int)ProfileVersion.Fifa20
+                        || ProfilesLibrary.DataVersion == (int)ProfileVersion.Madden22)
                     {
                         fieldObj.AddValue("offset", (int)field.DataOffset);
                         fieldObj.AddValue("nameHash", field.NameHash);
