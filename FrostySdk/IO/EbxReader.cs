@@ -1718,7 +1718,7 @@ namespace FrostySdk.IO
                             FieldIndex = reader.ReadInt(),
                             FieldCount = reader.ReadByte(),
                             Alignment = reader.ReadByte(),
-                            Type = reader.ReadUShort(),
+                            Type = (ushort)(reader.ReadUShort() >> 1),
                             Size = reader.ReadUShort(),
                             SecondSize = reader.ReadUShort(),
                             Index = i
@@ -1736,7 +1736,7 @@ namespace FrostySdk.IO
                         {
                             NameHash = reader.ReadUInt(),
                             DataOffset = reader.ReadUInt(),
-                            Type = reader.ReadUShort(),
+                            Type = (ushort)(reader.ReadUShort() >> 1),
                             ClassRef = reader.ReadUShort()
                         }
                     );
@@ -1808,9 +1808,10 @@ namespace FrostySdk.IO
 
             // EBXD
             var ebxdHeader = ReadUInt();
+            dataStartOffset = Position;
+
             var ebxdSize = ReadUInt();
             var unk1 = ReadBytes(0xC);
-            dataStartOffset = Position;
             fileGuid = ReadGuid();
 
             Position += ebxdSize - 0x1C;      
@@ -1854,13 +1855,14 @@ namespace FrostySdk.IO
 
             exportedCount = (ushort)ReadUInt();
             var dataOffsetCount = ReadUInt();
+            
             for (var i = 0; i < dataOffsetCount; i++)
             {
                 var offset = ReadUInt();
                 dataOffsets.Add(offset);
 
                 var currentPosition = Position;
-                Position = dataStartOffset + offset;
+                Position = dataStartOffset + offset + 0x10;
 
                 instances.Add
                 (
@@ -1913,7 +1915,8 @@ namespace FrostySdk.IO
             }
 
             arraysOffset = ReadUInt();
-            Position += 8;
+            Position += 4;
+            stringsOffset = ReadUInt() + 0x20;
 
             // EBXX
             var ebxxHeader = ReadUInt();
@@ -1938,10 +1941,30 @@ namespace FrostySdk.IO
                     }
                 );
             }
+
+            for (var i = 0; i < boxedValuesCount; i++)
+            {
+                var offset = ReadUInt();
+                var count = ReadUInt();
+                var hash = ReadUInt();
+                var type = ReadUShort();
+                var classRef = ReadUShort();
+
+                boxedValues.Add
+                (
+                    new EbxBoxedValue
+                    {
+                        Offset = offset,
+                        Type = type,
+                        ClassRef = classRef
+                    }
+                );
+            }
         }
 
         internal override void InternalReadObjects()
         {
+            Console.WriteLine($"READING OBJECTS FOR {fileGuid} ===============================");
             List<Type> types = new List<Type>();
             foreach (EbxInstance inst in instances)
             {
@@ -1956,9 +1979,12 @@ namespace FrostySdk.IO
             int typeId = 0;
             int index = 0;
 
-            foreach (EbxInstance inst in instances)
+            for (int i = 0; i < instances.Count; i++)
             {
-                for (int i = 0; i < inst.Count; i++)
+                EbxInstance inst = instances[i];
+                Position = dataStartOffset + dataOffsets[i];
+
+                for (int j = 0; j < inst.Count; j++)
                 {
                     dynamic obj = objects[typeId++];
                     Type objType = obj.GetType();
@@ -1967,12 +1993,13 @@ namespace FrostySdk.IO
                     Guid instanceGuid = Guid.Empty;
                     if (inst.IsExported)
                         instanceGuid = ReadGuid();
-
-                    if (classType.Alignment != 0x04)
-                        Position += 8;
+                    else
+                        Position += 0x10;
 
                     obj.SetInstanceGuid(new AssetClassGuid(instanceGuid, index++));
-                    ReadClass(classType, obj, Position - 8);
+
+                    Console.WriteLine($"Type: {classType.NameHash} @ offset {Position - 32:X}");
+                    ReadClass(classType, obj, Position);
                 }
             }
         }
@@ -2026,7 +2053,8 @@ namespace FrostySdk.IO
             }
             else
             {
-                int idx = ((classType.HasValue) ? classType.Value.Index : 0);
+                //int idx = (short)index + ((classType.HasValue) ? classType.Value.Index : 0);
+                int idx = index;
                 guid = std.GetGuid(idx);
 
                 if (classType.Value.SecondSize == 1)
@@ -2054,7 +2082,7 @@ namespace FrostySdk.IO
 
         internal override object CreateObject(EbxClass classType)
         {
-            return TypeLibrary.CreateObject(classType.SecondSize == 1 ? patchStd.GetGuid(classType) : std.GetGuid(classType));
+            return TypeLibrary.CreateObject(classType.SecondSize == 1 ? patchStd.GetTypeInfoGuid(classType) : std.GetTypeInfoGuid(classType));
         }
 
         internal override Type GetType(EbxClass classType)
@@ -2062,123 +2090,259 @@ namespace FrostySdk.IO
             return TypeLibrary.GetType(classType.SecondSize == 1 ? patchStd.GetGuid(classType) : std.GetGuid(classType));
         }
 
-        internal object ReadClass(EbxClassMetaAttribute classMeta, object obj, Type objType, long startOffset)
+        internal new object ReadClass(EbxClass classType, object obj, long startOffset)
         {
             if (obj == null)
             {
-                Position += classMeta.Size;
-                while (Position % classMeta.Alignment != 0)
-                    Position++;
+                Position += classType.Size;
                 return null;
             }
+            Type objType = obj.GetType();
 
-            if (objType.BaseType != typeof(object))
+            for (int j = 0; j < classType.FieldCount; j++)
             {
-                ReadClass(objType.BaseType.GetCustomAttribute<EbxClassMetaAttribute>(), obj, objType.BaseType, startOffset);
-            }
+                EbxField fieldType = GetField(classType, classType.FieldIndex + j);
+                PropertyInfo fieldProp = GetProperty(objType, fieldType);
 
-            PropertyInfo[] pis = objType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
-            foreach (PropertyInfo pi in pis)
-            {
-                if (pi.GetCustomAttribute<IsTransientAttribute>() != null)
-                    continue;
+                IsReferenceAttribute attr = (fieldProp != null)
+                    ? fieldProp.GetCustomAttribute<IsReferenceAttribute>()
+                    : null;
 
-                IsReferenceAttribute attr = pi.GetCustomAttribute<IsReferenceAttribute>();
-                EbxFieldMetaAttribute fieldMeta = pi.GetCustomAttribute<EbxFieldMetaAttribute>();
+                var dataOffset = fieldType.DataOffset + startOffset;
+                Console.WriteLine($"Field: {fieldType.NameHash} @ offset {dataOffset - 48:X}");
 
-                Position = startOffset + fieldMeta.Offset;
-                if (fieldMeta.Type == EbxFieldType.Array)
+                if (fieldType.DebugType == EbxFieldType.Inherited)
                 {
-                    int index = ReadInt();
-                    EbxArray array = arrays[index];
-
-                    long arrayPos = Position;
-                    Position = arraysOffset + array.Offset;
-
-                    // @temp: since constructors can add elements to an array, need to clear
-                    //        before attempting to read in new elements
-
-                    pi?.GetValue(obj).GetType().GetMethod("Clear").Invoke(pi.GetValue(obj), new object[] { });
-
-                    // read in array elements
-                    for (int i = 0; i < array.Count; i++)
-                    {
-                        object value = ReadField(fieldMeta.ArrayType, fieldMeta.BaseType, (attr != null));
-                        pi?.GetValue(obj).GetType().GetMethod("Add").Invoke(pi.GetValue(obj), new object[] { value });
-                    }
-                    Position = arrayPos;
+                    ReadClass(GetClass(classType, fieldType.ClassRef), obj, startOffset);
                 }
                 else
                 {
-                    object value = ReadField(fieldMeta.Type, pi.PropertyType, (attr != null));
-                    pi?.SetValue(obj, value);
+                    if (fieldType.DebugType == EbxFieldType.ResourceRef
+                        || fieldType.DebugType == EbxFieldType.TypeRef
+                        || fieldType.DebugType == EbxFieldType.FileRef
+                        || fieldType.DebugType == EbxFieldType.BoxedValueRef
+                        || fieldType.DebugType == EbxFieldType.UInt64
+                        || fieldType.DebugType == EbxFieldType.Int64
+                        || fieldType.DebugType == EbxFieldType.Float64)
+                    {
+                        // Structure alignment
+                        while (Position % 8 != 0)
+                            Position++;
+                    }
+                    else if (fieldType.DebugType == EbxFieldType.Array
+                        || fieldType.DebugType == EbxFieldType.Pointer)
+                    {
+                        while (Position % 4 != 0)
+                            Position++;
+                    }
+
+                    // @temp
+                    //if (fieldType.DebugType != EbxFieldType.Struct)
+                    //{
+                    //    if ((Position - startOffset) != fieldType.DataOffset)
+                    //        Console.WriteLine("Offset misalignment: " + fieldType.DebugType);
+                    //}
+                    Position = dataOffset;
+
+                    if (IsArray(fieldType.Type) || fieldType.DebugType == EbxFieldType.Array)
+                    {
+                        var valueOffset = ReadInt();
+                        Position += valueOffset - 8;
+                        var arrayCount = ReadUInt();
+
+                        var sizeOfStruct = 0;
+
+                        if (fieldType.ClassRef != 65535)
+                        {
+                            EbxClass arrayType = GetClass(classType, fieldType.ClassRef);
+                            sizeOfStruct = arrayType.Size; 
+                        }
+
+                        if (sizeOfStruct == 0 && fieldType.DebugType == EbxFieldType.Pointer)
+                        {
+                            sizeOfStruct = 8;
+                        }
+
+                        var startingPosition = Position;
+
+                        for (var i = 0; i < arrayCount; i++)
+                        {
+                            // If array of structs, align to the next struct size. Not all structs take up their size (because why would they??)
+                            if (sizeOfStruct > 0)
+                                Position = startingPosition + (sizeOfStruct * i);
+
+                            object value = ReadField(classType, fieldType.DebugType, fieldType.ClassRef, (attr != null));
+                            if (fieldProp != null)
+                            {
+                                try { fieldProp.GetValue(obj).GetType().GetMethod("Add").Invoke(fieldProp.GetValue(obj), new object[] { value }); }
+                                catch (Exception) { }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var oldStringsOffset = stringsOffset;
+
+                        // Hacky way to do this: The string offsets have changed in M22, they are relative to the current
+                        // field instead of relative to the string starting offset.
+
+                        // Rather than override the ReadField function (because this is the only thing that has changed),
+                        // I am overriding the strings offset for each relevant field and then resetting it after read is done.
+                        if (fieldType.DebugType == EbxFieldType.CString || fieldType.DebugType == EbxFieldType.FileRef 
+                            || fieldType.DebugType == EbxFieldType.TypeRef)
+                        {
+                            stringsOffset = Position;
+                        }
+
+                        object value = ReadField(classType, fieldType.DebugType, fieldType.ClassRef, (attr != null));
+
+                        stringsOffset = oldStringsOffset;
+
+                        if (fieldProp != null)
+                        {
+                            try { fieldProp.SetValue(obj, value); }
+                            catch (Exception) { }
+                        }
+                    }
                 }
             }
 
-            while (Position - startOffset != classMeta.Size)
-                Position++;
+            if (classType.Alignment != 0)   // M22: alignment is always 0.
+            {
+                while (Position % classType.Alignment != 0)
+                    Position++;
+            }
 
             return null;
         }
 
-        internal object ReadField(EbxFieldType type, Type baseType, bool dontRefCount = false)
+        internal new object ReadField(EbxClass? parentClass, EbxFieldType fieldType, ushort fieldClassRef, bool dontRefCount = false)
         {
-            switch (type)
+            switch (fieldType)
             {
-                case EbxFieldType.Boolean: return ReadByte() > 0;
-                case EbxFieldType.Int8: return (sbyte)ReadByte();
-                case EbxFieldType.UInt8: return ReadByte();
-                case EbxFieldType.Int16: return ReadShort();
-                case EbxFieldType.UInt16: return ReadUShort();
-                case EbxFieldType.Int32: return ReadInt();
-                case EbxFieldType.UInt32: return ReadUInt();
-                case EbxFieldType.Int64: return ReadLong();
-                case EbxFieldType.UInt64: return ReadULong();
-                case EbxFieldType.Float32: return ReadFloat();
-                case EbxFieldType.Float64: return ReadDouble();
-                case EbxFieldType.Guid: return ReadGuid();
-                case EbxFieldType.ResourceRef: return ReadResourceRef();
-                case EbxFieldType.Sha1: return ReadSha1();
-                case EbxFieldType.String: return ReadSizedString(32);
-                case EbxFieldType.CString: return ReadCString(ReadUInt());
-                case EbxFieldType.FileRef: return ReadFileRef();
-                case EbxFieldType.TypeRef: return ReadTypeRef();
-                case EbxFieldType.BoxedValueRef: return ReadBoxedValueRef();
                 case EbxFieldType.Struct:
-                    object structObj = TypeLibrary.CreateObject(baseType);
-                    EbxClassMetaAttribute classMeta = structObj.GetType().GetCustomAttribute<EbxClassMetaAttribute>();
-                    while (Position % classMeta.Alignment != 0)
-                        Position++;
-                    ReadClass(classMeta, structObj, structObj.GetType(), Position);
-                    return structObj;
-                case EbxFieldType.Enum:
-                    return ReadInt();
-                case EbxFieldType.Pointer:
-                    uint index = ReadUInt();
-                    if ((index >> 0x1F) == 1)
-                    {
-                        EbxImportReference import = imports[(int)(index & 0x7FFFFFFF)];
-                        if (dontRefCount && !dependencies.Contains(import.FileGuid))
-                            dependencies.Add(import.FileGuid);
+                    EbxClass structType = GetClass(parentClass, fieldClassRef);
+                    object structObj = CreateObject(structType);
 
-                        return new PointerRef(import);
-                    }
-                    else if (index == 0)
+                    Console.WriteLine($"Struct {structType.NameHash} @ offset {Position - 48:X}");
+
+                    ReadClass(structType, structObj, Position);
+                    return structObj;
+
+                case EbxFieldType.Pointer:
+                    var offset = ReadInt();
+                    
+                    if (offset == 0)
                     {
                         return new PointerRef();
                     }
+                    else if ((offset & 1) == 1)
+                    {
+                        return new PointerRef(imports[offset >> 1]);
+                    }
                     else
                     {
+                        var pointerDataOffset = Position - 4 + offset - 0x20;
+                        var dataOffset = dataOffsets.IndexOf((uint)pointerDataOffset);
+
                         if (!dontRefCount)
-                            refCounts[(int)(index - 1)]++;
-                        return new PointerRef(objects[(int)(index - 1)]);
+                            refCounts[dataOffset]++;
+
+                        Console.WriteLine($"Pointer {fieldType} @ offset {pointerDataOffset - 16:X}");
+                        return new PointerRef(objects[dataOffset]);
                     }
 
-                case EbxFieldType.DbObject:
-                    throw new InvalidDataException("DbObject");
+                case EbxFieldType.TypeRef:
+                    return new TypeRef(ReadUInt().ToString());
+
+                case EbxFieldType.BoxedValueRef:
+                    var type = ReadUShort();
+                    Position += 6;
+                    var valueOffset = ReadUInt();
+                    var offsetToLookup = Position - 4 + valueOffset - 0x20;
+
+                    var boxedValueIndex = boxedValues.FindIndex(boxVal => boxVal.Offset == offsetToLookup);
+
+                    if (boxedValueIndex == -1)
+                    {
+                        return new BoxedValueRef();
+                    }
+
+                    EbxBoxedValue boxedValue = boxedValues[boxedValueIndex];
+                    EbxFieldType subType = EbxFieldType.Inherited;
+
+                    Position += 4;
+                    var hashOffset = ReadUInt();
+
+                    Position = offsetToLookup + 0x20;
+                    object value = null;
+
+                    if (IsArray(boxedValue.Type) || (EbxFieldType)boxedValue.Type == EbxFieldType.Array)
+                    {
+                        var arrValueOffset = ReadInt();
+                        Position += arrValueOffset - 8;
+                        var arrayCount = ReadUInt();
+
+                        var sizeOfStruct = 0;
+
+                        if (boxedValue.ClassRef != 65535)
+                        {
+                            EbxClass arrayType = GetClass(null, boxedValue.ClassRef);
+                            sizeOfStruct = arrayType.Size;
+
+                            var arrayField = GetField(arrayType, arrayType.FieldIndex);
+                            value = Activator.CreateInstance(typeof(List<>).MakeGenericType(GetTypeFromEbxField(arrayField)));
+
+                            var startingPosition = Position;
+
+                            for (var i = 0; i < arrayCount; i++)
+                            {
+                                // If array of structs, align to the next struct size. Not all structs take up their size (because why would they??)
+                                if (sizeOfStruct > 0)
+                                    Position = startingPosition + (sizeOfStruct * i);
+
+                                object subValue = ReadField(arrayType, arrayField.DebugType, arrayField.ClassRef, false);
+                                value.GetType().GetMethod("Add").Invoke(value, new object[] { subValue });
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var boxedValueType = (EbxFieldType)(boxedValue.Type >> 5 & 0x1F);
+                        var oldStringsOffset = stringsOffset;
+
+                        // Hacky way to do this: The string offsets have changed in M22, they are relative to the current
+                        // field instead of relative to the string starting offset.
+
+                        // Rather than override the ReadField function (because this is the only thing that has changed),
+                        // I am overriding the strings offset for each relevant field and then resetting it after read is done.
+                        if (boxedValueType == EbxFieldType.CString || boxedValueType == EbxFieldType.FileRef
+                            || boxedValueType == EbxFieldType.TypeRef)
+                        {
+                            stringsOffset = Position;
+                        }
+
+                        value = ReadField(parentClass, (EbxFieldType)(boxedValue.Type >> 5 & 0x1F), boxedValue.ClassRef);
+                        if ((EbxFieldType)boxedValue.Type == EbxFieldType.Enum)
+                        {
+                            object tmpValue = value;
+                            EbxClass enumClass = GetClass(null, boxedValue.ClassRef);
+                            value = Enum.Parse(GetType(enumClass), tmpValue.ToString());
+                        }
+
+                        stringsOffset = oldStringsOffset;
+                    }
+
+                    return new BoxedValueRef(value, (EbxFieldType)boxedValue.Type, subType);
+
                 default:
-                    throw new InvalidDataException("Unknown");
+                    return base.ReadField(parentClass, fieldType, fieldClassRef, dontRefCount);
             }
+        }
+
+        internal bool IsArray(ushort fieldType)
+        {
+            return (fieldType & 0xF) == 4;
         }
     }
 }
