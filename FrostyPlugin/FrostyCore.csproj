@@ -141,6 +141,7 @@
     <Compile Include="Extensions\StartupAction.cs" />
     <Compile Include="FrostyConfiguration.cs" />
     <Compile Include="FrostyLogger.cs" />
+    <Compile Include="Legacy\LegacyFileManagerV2.cs" />
     <Compile Include="Mod\FrostyModRequirement.cs" />
     <Compile Include="Extensions\TabExtension.cs" />
     <Compile Include="IO\Executable.cs" />
