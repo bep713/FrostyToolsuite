@@ -31,6 +31,31 @@ namespace FrostySdk.Managers
                 public List<BundleFileInfoEntry> Entries { get; set; } = new List<BundleFileInfoEntry>();
             }
 
+            internal class ChunkGuidEntry
+            {
+                public Guid Guid { get; set; }
+                public byte Flag { get; set; }
+                public int IndexRaw { get; set; }
+                public int Index
+                {
+                    get
+                    {
+                        return IndexRaw / 3;
+                    }
+                }
+            }
+
+            internal class RawChunkAssetEntry
+            {
+                public byte Unk { get; set; }
+                public bool IsPatch { get; set; }
+                public byte Catalog { get; set; }
+                public byte Cas { get; set; }
+                public uint ChunkOffset { get; set; }
+                public uint ChunkSize { get; set; }
+                public Guid Guid { get; set; }
+            }
+
             internal class SBTocReader : NativeReader
             {
                 long dataStartOffset = 0;
@@ -48,8 +73,10 @@ namespace FrostySdk.Managers
                 int unk2Count = 0;
 
                 List<uint> bundleReferences;
+                List<ChunkGuidEntry> chunkGuidEntries;
 
                 public List<BundleFileInfo> BundleFileInfos { get; set; } = new List<BundleFileInfo>();
+                public List<RawChunkAssetEntry> RawChunkAssetEntries { get; set; } = new List<RawChunkAssetEntry>();
 
                 public SBTocReader(Stream inStream, IDeobfuscator inDeobfuscator)
                     : base(inStream, inDeobfuscator)
@@ -143,8 +170,62 @@ namespace FrostySdk.Managers
 
                             currentBundleInfo.Entries.Add(entry);
                         }
+                    }
+                }
+                
+                public void ReadChunks()
+                {
+                    ReadChunkGuids();
+                    ReadChunkEntries();
 
-                        
+                    foreach (var entry in chunkGuidEntries)
+                    {
+                        RawChunkAssetEntries[entry.Index].Guid = entry.Guid;
+                    }
+                }
+
+                private void ReadChunkGuids()
+                {
+                    chunkGuidEntries = new List<ChunkGuidEntry>();
+                    Position = dataStartOffset + chunksGuidOffset;
+
+                    for (var i = 0; i < chunksCount; i++)
+                    {
+                        byte[] bytes = ReadBytes(0x10);
+                        Array.Reverse(bytes);
+
+                        Guid guid = new Guid(bytes);
+                        uint flags = ReadUInt(Endian.Big);
+
+                        ChunkGuidEntry entry = new ChunkGuidEntry()
+                        {
+                            Guid = guid,
+                            Flag = (byte)((flags & 0xFF000000) >> 24),
+                            IndexRaw = (int)flags & 0xFFFFFF
+                        };
+
+                        chunkGuidEntries.Add(entry);
+                    }
+                }
+
+                private void ReadChunkEntries()
+                {
+                    Position = dataStartOffset + chunksEntryOffset;
+
+                    for (var i = 0; i < chunksCount; i++)
+                    {
+                        RawChunkAssetEntries.Add
+                        (
+                            new RawChunkAssetEntry()
+                            {
+                                Unk = ReadByte(),
+                                IsPatch = ReadBoolean(),
+                                Catalog = ReadByte(),
+                                Cas = ReadByte(),
+                                ChunkOffset = ReadUInt(Endian.Big),
+                                ChunkSize = ReadUInt(Endian.Big)
+                            }
+                        );
                     }
                 }
             }
@@ -167,95 +248,137 @@ namespace FrostySdk.Managers
                     }
 
                     parent.WriteToLog("Loading data ({0})", sbName);
-                    string tocPath = parent.fs.ResolvePath(string.Format("{0}.toc", sbName));
+                    string patchPath = parent.fs.ResolvePath(string.Format("native_patch/{0}.toc", sbName));
+                    string dataPath = parent.fs.ResolvePath(string.Format("native_data/{0}.toc", sbName));
 
-                    if (tocPath != "")
-                    { 
-                        List<BundleFileInfo> bundleFileInfos = new List<BundleFileInfo>();
+                    if (patchPath != "")
+                    {
+                        ReadSuperbundle(patchPath, parent, helper, sbIndex);
+                    }
 
-                        using (SBTocReader reader = new SBTocReader(new FileStream(tocPath, FileMode.Open, FileAccess.Read), parent.fs.CreateDeobfuscator()))
+                    if (dataPath != "")
+                    {
+                        ReadSuperbundle(dataPath, parent, helper, sbIndex);
+                    }
+                }
+            }
+
+            private void ReadSuperbundle(string tocPath, AssetManager parent, BinarySbDataHelper helper, int sbIndex)
+            {
+                List<BundleFileInfo> bundleFileInfos = new List<BundleFileInfo>();
+
+                using (SBTocReader reader = new SBTocReader(new FileStream(tocPath, FileMode.Open, FileAccess.Read), parent.fs.CreateDeobfuscator()))
+                {
+                    reader.ReadHeader();
+                    reader.ReadBundleReferences();
+                    reader.ReadBundleFileInfos();
+                    bundleFileInfos = reader.BundleFileInfos;
+
+                    reader.ReadChunks();
+
+                    foreach (var entry in reader.RawChunkAssetEntries)
+                    {
+                        var newChunkAssetEntry = new ChunkAssetEntry()
                         {
-                            reader.ReadHeader();
-                            reader.ReadBundleReferences();
-                            reader.ReadBundleFileInfos();
-                            bundleFileInfos = reader.BundleFileInfos;
+                            Id = entry.Guid,
+                            IsTocChunk = true,
+                            Size = entry.ChunkSize,
+                            Location = AssetDataLocation.CasNonIndexed,
+                            ExtraData = new AssetExtraData()
+                            {
+                                CasPath = parent.fs.GetFilePath(entry.Catalog, entry.Cas, entry.IsPatch),
+                                DataOffset = entry.ChunkOffset
+                            }
+                        };
+
+                        if (!parent.chunkList.TryGetValue(entry.Guid, out var chunkEntry))
+                        {
+                            parent.chunkList[entry.Guid] = newChunkAssetEntry;
                         }
-
-                        int currentBundleIndex = 0;
-
-                        foreach (var currentBundleInfo in bundleFileInfos)
+                        else
                         {
-                            parent.logger.Log("progress:{0}", (currentBundleIndex / (double)bundleFileInfos.Count) * 100.0d);
-
-                            MemoryStream ms = new MemoryStream();
-
-                            var bundleEntry = currentBundleInfo.Entries[0];
-
-                            DbObject bundle;
-
-                            var casFilePath = parent.fs.GetFilePath(bundleEntry.Catalog, bundleEntry.Cas, bundleEntry.IsPatch);
-
-                            using (NativeReader casReader = new NativeReader(new FileStream(parent.fs.ResolvePath(casFilePath), FileMode.Open, FileAccess.Read)))
-                            {
-                                casReader.Position = bundleEntry.CasOffset;
-                                ms.Write(casReader.ReadBytes(bundleEntry.Size), 0, bundleEntry.Size);
-                            }
-
-                            using (BinarySbReader bundleReader = new BinarySbReader(ms, 0, parent.fs.CreateDeobfuscator()))
-                            {
-                                bundleReader.binarySbReader.Endian = Endian.Little;
-                                bundle = bundleReader.ReadDbObject();
-                            }
-
-                            DbObject ebxs = bundle.GetValue<DbObject>("ebx");
-
-                            if (ebxs.Count > 0)
-                            {
-                                DbObject lastEbx = (DbObject)ebxs[ebxs.Count - 1];
-                                BundleEntry be = new BundleEntry { Name = lastEbx.GetValue<string>("name"), SuperBundleId = sbIndex };
-                                parent.bundles.Add(be);
-                            }
-
-                            List<DbObject> objects = new List<DbObject>();
-                            foreach(DbObject ebx in bundle.GetValue<DbObject>("ebx"))
-                            {
-                                objects.Add(ebx);
-                            }
-                            foreach (DbObject res in bundle.GetValue<DbObject>("res"))
-                            {
-                                objects.Add(res);
-                            }
-                            foreach (DbObject chunk in bundle.GetValue<DbObject>("chunks"))
-                            {
-                                objects.Add(chunk);
-                            }
-
-                            int objectIndex = 1;    // Start at 1 because the bundle entry is always the 0th index.
-
-                            foreach (DbObject obj in objects)
-                            {
-                                var entry = currentBundleInfo.Entries[objectIndex];
-
-                                obj.SetValue("catalog", entry.Catalog);
-                                obj.SetValue("cas", entry.Cas);
-                                obj.SetValue("offset", entry.CasOffset);
-                                obj.SetValue("size", entry.Size);
-
-                                if (entry.IsPatch)
-                                {
-                                    obj.SetValue("patch", true);
-                                }
-
-                                objectIndex++;
-                            }
-
-                            parent.ProcessBundleEbx(bundle, parent.bundles.Count - 1, helper);
-                            parent.ProcessBundleRes(bundle, parent.bundles.Count - 1, helper);
-                            parent.ProcessBundleChunks(bundle, parent.bundles.Count - 1, helper);
-
-                            currentBundleIndex += 1;
+                            chunkEntry.Id = newChunkAssetEntry.Id;
+                            chunkEntry.Size = newChunkAssetEntry.Size;
+                            chunkEntry.Location = newChunkAssetEntry.Location;
+                            chunkEntry.ExtraData = newChunkAssetEntry.ExtraData;
+                            chunkEntry.IsTocChunk = newChunkAssetEntry.IsTocChunk;
                         }
                     }
+                }
+
+                int currentBundleIndex = 0;
+
+                foreach (var currentBundleInfo in bundleFileInfos)
+                {
+                    parent.logger.Log("progress:{0}", (currentBundleIndex / (double)bundleFileInfos.Count) * 100.0d);
+
+                    MemoryStream ms = new MemoryStream();
+
+                    var bundleEntry = currentBundleInfo.Entries[0];
+
+                    DbObject bundle;
+
+                    var casFilePath = parent.fs.GetFilePath(bundleEntry.Catalog, bundleEntry.Cas, bundleEntry.IsPatch);
+
+                    using (NativeReader casReader = new NativeReader(new FileStream(parent.fs.ResolvePath(casFilePath), FileMode.Open, FileAccess.Read)))
+                    {
+                        casReader.Position = bundleEntry.CasOffset;
+                        ms.Write(casReader.ReadBytes(bundleEntry.Size), 0, bundleEntry.Size);
+                    }
+
+                    using (BinarySbReader bundleReader = new BinarySbReader(ms, 0, parent.fs.CreateDeobfuscator()))
+                    {
+                        bundleReader.binarySbReader.Endian = Endian.Little;
+                        bundle = bundleReader.ReadDbObject();
+                    }
+
+                    DbObject ebxs = bundle.GetValue<DbObject>("ebx");
+
+                    if (ebxs.Count > 0)
+                    {
+                        DbObject lastEbx = (DbObject)ebxs[ebxs.Count - 1];
+                        BundleEntry be = new BundleEntry { Name = lastEbx.GetValue<string>("name"), SuperBundleId = sbIndex };
+                        parent.bundles.Add(be);
+                    }
+
+                    List<DbObject> objects = new List<DbObject>();
+                    foreach (DbObject ebx in bundle.GetValue<DbObject>("ebx"))
+                    {
+                        objects.Add(ebx);
+                    }
+                    foreach (DbObject res in bundle.GetValue<DbObject>("res"))
+                    {
+                        objects.Add(res);
+                    }
+                    foreach (DbObject chunk in bundle.GetValue<DbObject>("chunks"))
+                    {
+                        objects.Add(chunk);
+                    }
+
+                    int objectIndex = 1;    // Start at 1 because the bundle entry is always the 0th index.
+
+                    foreach (DbObject obj in objects)
+                    {
+                        var entry = currentBundleInfo.Entries[objectIndex];
+
+                        obj.SetValue("catalog", entry.Catalog);
+                        obj.SetValue("cas", entry.Cas);
+                        obj.SetValue("offset", entry.CasOffset);
+                        obj.SetValue("size", entry.Size);
+
+                        if (entry.IsPatch)
+                        {
+                            obj.SetValue("patch", true);
+                        }
+
+                        objectIndex++;
+                    }
+
+                    parent.ProcessBundleEbx(bundle, parent.bundles.Count - 1, helper);
+                    parent.ProcessBundleRes(bundle, parent.bundles.Count - 1, helper);
+                    parent.ProcessBundleChunks(bundle, parent.bundles.Count - 1, helper);
+
+                    currentBundleIndex += 1;
                 }
             }
         }
