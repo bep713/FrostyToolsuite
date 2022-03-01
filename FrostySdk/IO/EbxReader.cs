@@ -1811,17 +1811,17 @@ namespace FrostySdk.IO
             dataStartOffset = Position;
 
             var ebxdSize = ReadUInt();
-            var unk1 = ReadBytes(0xC);
-            fileGuid = ReadGuid();
+            //var unk1 = ReadBytes(0xC);
+            //fileGuid = ReadGuid();
 
-            Position += ebxdSize - 0x1C;      
+            Position += ebxdSize;      
 
             while (InStream.Position % 2 != 0) Position++;
 
             // EFIX
             var efixHeader = ReadUInt();
             var efixSize = ReadUInt();
-            var fileGuid2 = ReadGuid();
+            fileGuid = ReadGuid();
             var classGuidCount = ReadUInt();
 
             for (var i = 0; i < classGuidCount; i++)
@@ -1964,7 +1964,7 @@ namespace FrostySdk.IO
 
         internal override void InternalReadObjects()
         {
-            Console.WriteLine($"READING OBJECTS FOR {fileGuid} ===============================");
+            //Console.WriteLine($"READING OBJECTS FOR {fileGuid} ===============================");
             List<Type> types = new List<Type>();
             foreach (EbxInstance inst in instances)
             {
@@ -1998,7 +1998,7 @@ namespace FrostySdk.IO
 
                     obj.SetInstanceGuid(new AssetClassGuid(instanceGuid, index++));
 
-                    Console.WriteLine($"Type: {classType.NameHash} @ offset {Position - 32:X}");
+                    //Console.WriteLine($"Type: {classType.NameHash} @ offset {Position - 32:X}");
                     ReadClass(classType, obj, Position);
                 }
             }
@@ -2109,7 +2109,7 @@ namespace FrostySdk.IO
                     : null;
 
                 var dataOffset = fieldType.DataOffset + startOffset;
-                Console.WriteLine($"Field: {fieldType.NameHash} @ offset {dataOffset - 48:X}");
+                //Console.WriteLine($"Field: {fieldType.NameHash} @ offset {dataOffset - 48:X}");
 
                 if (fieldType.DebugType == EbxFieldType.Inherited)
                 {
@@ -2224,7 +2224,7 @@ namespace FrostySdk.IO
                     EbxClass structType = GetClass(parentClass, fieldClassRef);
                     object structObj = CreateObject(structType);
 
-                    Console.WriteLine($"Struct {structType.NameHash} @ offset {Position - 48:X}");
+                    //Console.WriteLine($"Struct {structType.NameHash} @ offset {Position - 48:X}");
 
                     ReadClass(structType, structObj, Position);
                     return structObj;
@@ -2248,7 +2248,7 @@ namespace FrostySdk.IO
                         if (!dontRefCount)
                             refCounts[dataOffset]++;
 
-                        Console.WriteLine($"Pointer {fieldType} @ offset {pointerDataOffset - 16:X}");
+                        //Console.WriteLine($"Pointer {fieldType} @ offset {pointerDataOffset - 16:X}");
                         return new PointerRef(objects[dataOffset]);
                     }
 
