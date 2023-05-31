@@ -165,7 +165,7 @@ namespace FrostySdk.Resources
                 reader.ReadByte();
             }
 
-            if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour))
             {
                 Unknown3[0] = reader.ReadUInt();
             }
@@ -194,7 +194,7 @@ namespace FrostySdk.Resources
 
             AssetNameHash = reader.ReadUInt();
 
-            if (ProfilesLibrary.IsLoaded(ProfileVersion.PlantsVsZombiesGardenWarfare2, ProfileVersion.Madden22, ProfileVersion.Madden23))
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.PlantsVsZombiesGardenWarfare2, ProfileVersion.Madden22, ProfileVersion.Madden23, ProfileVersion.Madden24))
             {
                 Unknown3[0] = reader.ReadUInt();
             }
@@ -275,7 +275,7 @@ namespace FrostySdk.Resources
                     writer.Write(MipCount);
                 }
 
-                if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+                if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour))
                 {
                     writer.Write(Unknown3[0]);
                 }
@@ -304,7 +304,7 @@ namespace FrostySdk.Resources
 
                 writer.Write(AssetNameHash);
 
-                if (ProfilesLibrary.IsLoaded(ProfileVersion.PlantsVsZombiesGardenWarfare2, ProfileVersion.Madden22, ProfileVersion.Madden23))
+                if (ProfilesLibrary.IsLoaded(ProfileVersion.PlantsVsZombiesGardenWarfare2, ProfileVersion.Madden22, ProfileVersion.Madden23, ProfileVersion.Madden24))
                 {
                     writer.Write(Unknown3[0]);
                 }

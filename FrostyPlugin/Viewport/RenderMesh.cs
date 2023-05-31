@@ -812,7 +812,7 @@ namespace Frosty.Core.Viewport
                 else if (ProfilesLibrary.IsLoaded(ProfileVersion.Fifa17, ProfileVersion.Fifa18,
                     ProfileVersion.Fifa19, ProfileVersion.Fifa20,
                     ProfileVersion.NeedForSpeedHeat, ProfileVersion.Fifa21,
-                    ProfileVersion.Fifa22, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+                    ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
                 {
                     paramName = paramName.ToLower();
                     if (paramName.StartsWith("colortexture") || paramName.StartsWith("diffuse") || paramName.Contains("basecolor"))
@@ -845,7 +845,7 @@ namespace Frosty.Core.Viewport
                 }
 
                 // Madden
-                else if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden19, ProfileVersion.Madden20, ProfileVersion.Madden21, ProfileVersion.Madden22, ProfileVersion.Madden23))
+                else if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden19, ProfileVersion.Madden20, ProfileVersion.Madden21, ProfileVersion.Madden22, ProfileVersion.Madden23, ProfileVersion.PGATour, ProfileVersion.Madden24))
                 {
                     paramName = paramName.ToLower();
                     if (paramName.StartsWith("colortexture")) { DiffuseTexture = state.TextureLibrary.LoadTextureAsset(value.External.FileGuid); }

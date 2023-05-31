@@ -391,6 +391,8 @@ namespace FrostySdk
                     case (int)ProfileVersion.Fifa23:
                     case (int)ProfileVersion.NeedForSpeedUnbound:
                     case (int)ProfileVersion.DeadSpace:
+                    case (int)ProfileVersion.PGATour:
+                    case (int)ProfileVersion.Madden24:
                         return 16;
                     default:
                         return 8;
@@ -569,7 +571,8 @@ namespace FrostySdk
                 ProfileVersion.NeedForSpeedHeat, ProfileVersion.Fifa21,
                 ProfileVersion.Madden22, ProfileVersion.Fifa22,
                 ProfileVersion.Battlefield2042, ProfileVersion.Madden23,
-                ProfileVersion.Fifa23, ProfileVersion.NeedForSpeedUnbound))
+                ProfileVersion.Fifa23, ProfileVersion.NeedForSpeedUnbound,
+                ProfileVersion.PGATour, ProfileVersion.Madden24))
             {
                 Compress2 = Marshal.GetDelegateForFunctionPointer<CompressFunc2>(Kernel32.GetProcAddress(handle, "OodleLZ_Compress"));
             }
@@ -672,7 +675,7 @@ namespace FrostySdk
             {
                 GetErrorCode = Marshal.GetDelegateForFunctionPointer<GetErrorCodeFunc>(Kernel32.GetProcAddress(handle, "ZSTD_getErrorCode"));
                 GetErrorName = Marshal.GetDelegateForFunctionPointer<GetErrorNameFunc>(Kernel32.GetProcAddress(handle, "ZSTD_getErrorName"));
-                if (ProfilesLibrary.IsLoaded(ProfileVersion.Fifa18, ProfileVersion.Fifa19, ProfileVersion.Fifa20, ProfileVersion.Fifa21, ProfileVersion.Fifa22))
+                if (ProfilesLibrary.IsLoaded(ProfileVersion.Fifa18, ProfileVersion.Fifa19, ProfileVersion.Fifa20, ProfileVersion.Fifa21, ProfileVersion.Fifa22, ProfileVersion.Fifa23))
                 {
                     DecompressUsingDict = Marshal.GetDelegateForFunctionPointer<DecompressUsingDictFunc>(Kernel32.GetProcAddress(handle, "ZSTD_decompress_usingDDict"));
                     CreateDigestedDict = Marshal.GetDelegateForFunctionPointer<CreateDigestedDictFunc>(Kernel32.GetProcAddress(handle, "ZSTD_createDDict"));
@@ -929,7 +932,7 @@ namespace FrostySdk
         {
             get
             {
-                if (ProfilesLibrary.IsLoaded(ProfileVersion.Fifa18, ProfileVersion.Fifa19, ProfileVersion.Fifa20, ProfileVersion.Fifa21, ProfileVersion.Fifa22))
+                if (ProfilesLibrary.IsLoaded(ProfileVersion.Fifa18, ProfileVersion.Fifa19, ProfileVersion.Fifa20, ProfileVersion.Fifa21, ProfileVersion.Fifa22, ProfileVersion.Fifa23))
                     return 0x40000;
                 return 0x10000;
             }
@@ -953,7 +956,8 @@ namespace FrostySdk
                          ProfileVersion.Fifa19, ProfileVersion.Fifa20,
                          ProfileVersion.Battlefield5, ProfileVersion.StarWarsSquadrons,
                          ProfileVersion.Fifa21, ProfileVersion.Madden22,
-                         ProfileVersion.Fifa22, ProfileVersion.Madden23, ProfileVersion.DeadSpace))
+                         ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Madden23,
+                         ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24))
                 {
                     compressionType = CompressionType.ZStd;
                 }
@@ -1165,13 +1169,13 @@ namespace FrostySdk
             if (ProfilesLibrary.IsLoaded(ProfileVersion.Anthem, ProfileVersion.Fifa19,
                 ProfileVersion.Fifa20, ProfileVersion.NeedForSpeedHeat,
                 ProfileVersion.PlantsVsZombiesBattleforNeighborville, ProfileVersion.Madden22,
-                ProfileVersion.Madden23))
+                ProfileVersion.Madden23, ProfileVersion.PGATour, ProfileVersion.Madden24))
             {
                 // Kraken
                 compressCode = 0x1170;
                 size = (ulong)Oodle.Compress2(Oodle.OodleFormat.Kraken, ptr1.AddrOfPinnedObject(), buffer.Length, ptr2.AddrOfPinnedObject(), Oodle.OodleCompressionLevel.Optimal3, Oodle.GetOptions(Oodle.OodleFormat.Kraken, Oodle.OodleCompressionLevel.Optimal3));
             }
-            else if (ProfilesLibrary.IsLoaded(ProfileVersion.Fifa21, ProfileVersion.Fifa22,
+            else if (ProfilesLibrary.IsLoaded(ProfileVersion.Fifa21, ProfileVersion.Fifa22, ProfileVersion.Fifa23,
                 ProfileVersion.NeedForSpeedUnbound))
             {
                 // Leviathan

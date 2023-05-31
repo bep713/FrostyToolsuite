@@ -315,10 +315,13 @@ namespace FrostySdk.Managers
                         ProfileVersion.Fifa21,
                         ProfileVersion.Madden22,
                         ProfileVersion.Fifa22,
+                        ProfileVersion.Fifa23,
                         ProfileVersion.Battlefield2042,
                         ProfileVersion.Madden23,
                         ProfileVersion.NeedForSpeedUnbound,
-                        ProfileVersion.DeadSpace))
+                        ProfileVersion.DeadSpace,
+                        ProfileVersion.PGATour,
+                        ProfileVersion.Madden24))
                 {
                     // load class infos
                     WriteToLog("Loading type info");
@@ -704,7 +707,7 @@ namespace FrostySdk.Managers
             };
             CompressionType compressType = ProfilesLibrary.IsLoaded(ProfileVersion.Fifa18, ProfileVersion.Fifa20,
                 ProfileVersion.Fifa21, ProfileVersion.Madden22,
-                ProfileVersion.Fifa22, ProfileVersion.Madden23) ? CompressionType.Oodle : CompressionType.Default;
+                ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Madden23, ProfileVersion.PGATour, ProfileVersion.Madden24) ? CompressionType.Oodle : CompressionType.Default;
 
             while (m_resRidList.ContainsKey(entry.ResRid))
             {
@@ -736,7 +739,7 @@ namespace FrostySdk.Managers
             ChunkAssetEntry entry = new ChunkAssetEntry { IsAdded = true, IsDirty = true };
             CompressionType compressType = ProfilesLibrary.IsLoaded(ProfileVersion.Fifa18, ProfileVersion.Fifa20,
                 ProfileVersion.Fifa21, ProfileVersion.Madden22,
-                ProfileVersion.Fifa22, ProfileVersion.Madden23) ? CompressionType.Oodle : CompressionType.Default;
+                ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Madden23, ProfileVersion.PGATour, ProfileVersion.Madden24) ? CompressionType.Oodle : CompressionType.Default;
 
             entry.ModifiedEntry = new ModifiedAssetEntry
             {
@@ -789,7 +792,7 @@ namespace FrostySdk.Managers
             ChunkAssetEntry entry = m_chunkList[chunkId];
             CompressionType compressType = ProfilesLibrary.IsLoaded(ProfileVersion.Fifa18, ProfileVersion.Fifa20,
                 ProfileVersion.Fifa21, ProfileVersion.Madden22,
-                ProfileVersion.Fifa22, ProfileVersion.Madden23) ? CompressionType.Oodle : CompressionType.Default;
+                ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Madden23, ProfileVersion.PGATour, ProfileVersion.Madden24) ? CompressionType.Oodle : CompressionType.Default;
 
             if (entry.ModifiedEntry == null)
             {
@@ -830,7 +833,7 @@ namespace FrostySdk.Managers
             ResAssetEntry entry = m_resRidList[resRid];
             CompressionType compressType = ProfilesLibrary.IsLoaded(ProfileVersion.Fifa18, ProfileVersion.Fifa20,
                 ProfileVersion.Fifa21, ProfileVersion.Madden22,
-                ProfileVersion.Fifa22, ProfileVersion.Madden23) ? CompressionType.Oodle : CompressionType.Default;
+                ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Madden23, ProfileVersion.PGATour, ProfileVersion.Madden24) ? CompressionType.Oodle : CompressionType.Default;
 
             if (entry.ModifiedEntry == null)
             {
@@ -885,7 +888,7 @@ namespace FrostySdk.Managers
             ResAssetEntry entry = m_resList[resName];
             CompressionType compressType = ProfilesLibrary.IsLoaded(ProfileVersion.Fifa18, ProfileVersion.Fifa20,
                 ProfileVersion.Fifa21, ProfileVersion.Madden22,
-                ProfileVersion.Fifa22, ProfileVersion.Madden23) ? CompressionType.Oodle : CompressionType.Default;
+                ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Madden23, ProfileVersion.PGATour, ProfileVersion.Madden24) ? CompressionType.Oodle : CompressionType.Default;
 
             if (entry.ModifiedEntry == null)
             {
