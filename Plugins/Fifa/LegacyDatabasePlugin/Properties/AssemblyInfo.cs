@@ -38,5 +38,6 @@ using System.Windows;
 [assembly: PluginValidForProfile((int)ProfileVersion.Madden23)]
 [assembly: PluginValidForProfile((int)ProfileVersion.PGATour)]
 [assembly: PluginValidForProfile((int)ProfileVersion.Madden24)]
+[assembly: PluginValidForProfile((int)ProfileVersion.EAAntiCheat)]
 
 [assembly: RegisterAssetDefinition("DB", typeof(DatabaseAssetDefinition))]

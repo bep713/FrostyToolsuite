@@ -321,7 +321,8 @@ namespace FrostySdk.Managers
                         ProfileVersion.NeedForSpeedUnbound,
                         ProfileVersion.DeadSpace,
                         ProfileVersion.PGATour,
-                        ProfileVersion.Madden24))
+                        ProfileVersion.Madden24,
+                        ProfileVersion.EAAntiCheat))
                 {
                     // load class infos
                     WriteToLog("Loading type info");
@@ -459,6 +460,10 @@ namespace FrostySdk.Managers
 
         public uint GetModifiedCount()
         {
+            if (!IsCacheGenerated())
+            {
+                return 0;
+            }
             uint modifiedEbx = (uint)m_ebxList.Values.Count((EbxAssetEntry entry) => entry.IsModified);
             uint modifiedRes = (uint)m_resList.Values.Count((ResAssetEntry entry) => entry.IsModified);
             uint modifiedChunks = (uint)m_chunkList.Values.Count((ChunkAssetEntry entry) => entry.IsModified);
@@ -471,8 +476,18 @@ namespace FrostySdk.Managers
             return modifiedEbx + modifiedRes + modifiedChunks + modifiedCustom;
         }
 
+        public bool IsCacheGenerated()
+        {
+            string cacheFilePath = m_fileSystem.CacheName + "_sbdata.cas";
+            return File.Exists(cacheFilePath);
+        }
+
         public uint GetDirtyCount()
         {
+            if (!IsCacheGenerated())
+            {
+                return 0;
+            }
             uint dirtyEbx = (uint)m_ebxList.Values.Count((EbxAssetEntry entry) => entry.IsDirty);
             uint dirtyRes = (uint)m_resList.Values.Count((ResAssetEntry entry) => entry.IsDirty);
             uint dirtyChunks = (uint)m_chunkList.Values.Count((ChunkAssetEntry entry) => entry.IsDirty);
@@ -707,7 +722,9 @@ namespace FrostySdk.Managers
             };
             CompressionType compressType = ProfilesLibrary.IsLoaded(ProfileVersion.Fifa18, ProfileVersion.Fifa20,
                 ProfileVersion.Fifa21, ProfileVersion.Madden22,
-                ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Madden23, ProfileVersion.PGATour, ProfileVersion.Madden24) ? CompressionType.Oodle : CompressionType.Default;
+                ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Madden23,
+                ProfileVersion.PGATour, ProfileVersion.Madden24,
+                ProfileVersion.EAAntiCheat) ? CompressionType.Oodle : CompressionType.Default;
 
             while (m_resRidList.ContainsKey(entry.ResRid))
             {
@@ -739,7 +756,9 @@ namespace FrostySdk.Managers
             ChunkAssetEntry entry = new ChunkAssetEntry { IsAdded = true, IsDirty = true };
             CompressionType compressType = ProfilesLibrary.IsLoaded(ProfileVersion.Fifa18, ProfileVersion.Fifa20,
                 ProfileVersion.Fifa21, ProfileVersion.Madden22,
-                ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Madden23, ProfileVersion.PGATour, ProfileVersion.Madden24) ? CompressionType.Oodle : CompressionType.Default;
+                ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Madden23,
+                ProfileVersion.PGATour, ProfileVersion.Madden24,
+                ProfileVersion.EAAntiCheat) ? CompressionType.Oodle : CompressionType.Default;
 
             entry.ModifiedEntry = new ModifiedAssetEntry
             {
@@ -792,7 +811,8 @@ namespace FrostySdk.Managers
             ChunkAssetEntry entry = m_chunkList[chunkId];
             CompressionType compressType = ProfilesLibrary.IsLoaded(ProfileVersion.Fifa18, ProfileVersion.Fifa20,
                 ProfileVersion.Fifa21, ProfileVersion.Madden22,
-                ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Madden23, ProfileVersion.PGATour, ProfileVersion.Madden24) ? CompressionType.Oodle : CompressionType.Default;
+                ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Madden23, ProfileVersion.PGATour,
+                ProfileVersion.Madden24, ProfileVersion.EAAntiCheat) ? CompressionType.Oodle : CompressionType.Default;
 
             if (entry.ModifiedEntry == null)
             {
@@ -833,7 +853,8 @@ namespace FrostySdk.Managers
             ResAssetEntry entry = m_resRidList[resRid];
             CompressionType compressType = ProfilesLibrary.IsLoaded(ProfileVersion.Fifa18, ProfileVersion.Fifa20,
                 ProfileVersion.Fifa21, ProfileVersion.Madden22,
-                ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Madden23, ProfileVersion.PGATour, ProfileVersion.Madden24) ? CompressionType.Oodle : CompressionType.Default;
+                ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Madden23,
+                ProfileVersion.PGATour, ProfileVersion.Madden24, ProfileVersion.EAAntiCheat) ? CompressionType.Oodle : CompressionType.Default;
 
             if (entry.ModifiedEntry == null)
             {
@@ -888,7 +909,8 @@ namespace FrostySdk.Managers
             ResAssetEntry entry = m_resList[resName];
             CompressionType compressType = ProfilesLibrary.IsLoaded(ProfileVersion.Fifa18, ProfileVersion.Fifa20,
                 ProfileVersion.Fifa21, ProfileVersion.Madden22,
-                ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Madden23, ProfileVersion.PGATour, ProfileVersion.Madden24) ? CompressionType.Oodle : CompressionType.Default;
+                ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Madden23,
+                ProfileVersion.PGATour, ProfileVersion.Madden24, ProfileVersion.EAAntiCheat) ? CompressionType.Oodle : CompressionType.Default;
 
             if (entry.ModifiedEntry == null)
             {
@@ -1645,7 +1667,16 @@ namespace FrostySdk.Managers
 
             m_resList.Add(name, entry);
             if (entry.ResRid != 0)
-                m_resRidList.Add(entry.ResRid, entry);
+            {
+                if (!m_resRidList.ContainsKey(entry.ResRid))
+                {
+                    m_resRidList.Add(entry.ResRid, entry);
+                }
+                else
+                {
+                    // Key already exists, so do nothing (skip adding the new item)
+                }
+            }
 
             return entry;
         }
@@ -1891,7 +1922,12 @@ namespace FrostySdk.Managers
                     {
                         m_resList.Add(entry.Name, entry);
                         if (entry.ResRid != 0)
-                            m_resRidList.Add(entry.ResRid, entry);
+                        {
+                            if (!m_resRidList.ContainsKey(entry.ResRid))
+                            {
+                                m_resRidList.Add(entry.ResRid, entry);
+                            }
+                        }
                     }
                 }
 
@@ -1935,7 +1971,7 @@ namespace FrostySdk.Managers
                     {
                         entry.SuperBundles.Add(reader.ReadInt());
                     }
-                    
+
                     bool hasExtraData = reader.ReadBoolean();
                     if (hasExtraData)
                     {
@@ -1955,7 +1991,17 @@ namespace FrostySdk.Managers
                         entry.Bundles.Add(reader.ReadInt());
 
                     if (!isPatched)
-                        m_chunkList.Add(entry.Id, entry);
+                    {
+                        if (!m_chunkList.ContainsKey(entry.Id))
+                        {
+                            m_chunkList.Add(entry.Id, entry);
+                        }
+                        else
+                        {
+                            // Handle the situation where the key already exists, e.g. by updating the value
+                            m_chunkList[entry.Id] = entry;
+                        }
+                    }
                 }
             }
 

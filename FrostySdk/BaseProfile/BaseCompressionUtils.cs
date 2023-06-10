@@ -22,11 +22,11 @@ namespace FrostySdk.BaseProfile
                 return basePath + "oo2core_7_win64.dll";
             }
             else if (ProfilesLibrary.IsLoaded(ProfileVersion.Fifa21, ProfileVersion.Madden22, ProfileVersion.Fifa22,
-                ProfileVersion.Battlefield2042, ProfileVersion.Madden23, ProfileVersion.PGATour, ProfileVersion.Madden24))
+                ProfileVersion.Battlefield2042, ProfileVersion.Madden23, ProfileVersion.PGATour))
             {
                 return basePath + "oo2core_8_win64.dll";
             }
-            else if (ProfilesLibrary.IsLoaded(ProfileVersion.Fifa23, ProfileVersion.NeedForSpeedUnbound))
+            else if (ProfilesLibrary.IsLoaded(ProfileVersion.Fifa23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.Madden24, ProfileVersion.EAAntiCheat))
             {
                 return basePath + "oo2core_9_win64.dll";
             }
@@ -55,13 +55,15 @@ namespace FrostySdk.BaseProfile
         public bool LoadOodle => ProfilesLibrary.IsLoaded(ProfileVersion.Fifa18, ProfileVersion.Fifa19, ProfileVersion.Anthem,
             ProfileVersion.Fifa20, ProfileVersion.PlantsVsZombiesBattleforNeighborville, ProfileVersion.NeedForSpeedHeat,
             ProfileVersion.Fifa21, ProfileVersion.Madden22, ProfileVersion.Fifa22,
-            ProfileVersion.Battlefield2042, ProfileVersion.Madden23, ProfileVersion.Fifa23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.PGATour, ProfileVersion.Madden24);
+            ProfileVersion.Battlefield2042, ProfileVersion.Madden23, ProfileVersion.Fifa23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.PGATour,
+            ProfileVersion.Madden24, ProfileVersion.EAAntiCheat);
 
         public bool LoadZStd => ProfilesLibrary.IsLoaded(ProfileVersion.MassEffectAndromeda, ProfileVersion.Fifa17, ProfileVersion.Fifa18,
             ProfileVersion.StarWarsBattlefrontII, ProfileVersion.Madden19, ProfileVersion.Fifa19,
             ProfileVersion.Battlefield5, ProfileVersion.Fifa20, ProfileVersion.StarWarsSquadrons,
             ProfileVersion.Fifa21, ProfileVersion.Madden22, ProfileVersion.Fifa22, ProfileVersion.Fifa23,
-            ProfileVersion.Madden23, ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24);
+            ProfileVersion.Madden23, ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24,
+            ProfileVersion.EAAntiCheat);
 
         public int OodleCompressionLevel => ProfilesLibrary.IsLoaded(ProfileVersion.StarWarsBattlefrontII, ProfileVersion.Battlefield5, ProfileVersion.StarWarsSquadrons) ? 18 : 16;
     }

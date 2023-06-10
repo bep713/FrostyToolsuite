@@ -51,7 +51,8 @@ namespace FrostySdk
         NeedForSpeedUnbound = 20221129,
         DeadSpace = 20230127,
         PGATour = 20230407,
-        Madden24 = 20230608
+        Madden24 = 20230608,
+        EAAntiCheat = 20230609
     }
 
     public struct Profile
