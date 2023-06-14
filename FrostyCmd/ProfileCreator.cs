@@ -1106,7 +1106,7 @@ namespace FrostyCmd
 
         private void CreateFifa23Profile()
         {
-            string key = "FIFA23a";
+            string key = "FIFA23";
             using (NativeWriter writer = new NativeWriter(new MemoryStream()))
             {
                 writer.WriteObfuscatedString("FIFA 23");
@@ -1243,34 +1243,6 @@ namespace FrostyCmd
                 blobs.Add(key, writer.ToByteArray());
             }
         }
-        //Madden24 Beta EAAC Spoof
-        private void CreateEAAntiCheatProfile()
-        {
-            string key = "FIFA23";
-            using (NativeWriter writer = new NativeWriter(new MemoryStream()))
-            {
-                writer.WriteObfuscatedString("EAAntiCheat™");
-                writer.Write((int)ProfileVersion.EAAntiCheat);
-                writer.WriteObfuscatedString("EAAntiCheat");
-                writer.WriteObfuscatedString(typeof(NullDeobfuscator).Name);
-                writer.WriteObfuscatedString(AssetManager.GetLoaderName("CasAssetLoader"));
-                writer.Write(CreateSources("Patch;false", "Data;false"));
-                writer.WriteObfuscatedString("EAAntiCheatSDK");
-                writer.Write(CreateBanner("EAAntiCheat"));
-                writer.WriteObfuscatedString("content/common/textures/debug/debug_texture_color");
-                writer.WriteObfuscatedString("content/common/textures/debug/debug_texture_norm");
-                writer.WriteObfuscatedString("content/Common/textures/debug/debug_texture_coeff");
-                writer.WriteObfuscatedString("content/common/textures/debug/debug_texture_alpha");
-                writer.Write(0); // shared bundle names
-                writer.Write(0); // ignored res types
-
-                // Flags (MustAddChunks, EbxVersion, RequiresKey)
-                ProfileFlags pf = new ProfileFlags(0, 6, 1);
-                pf.Write(writer);
-
-                blobs.Add(key, writer.ToByteArray());
-            }
-        }
 
         public ProfileCreator()
         {
@@ -1303,6 +1275,8 @@ namespace FrostyCmd
             CreateBFHProfile();
             CreateSWSProfile();
             CreateNFSUnboundProfile();
+            CreatePGATourProfile();
+            CreateMadden24Profile();
 
 #if FROSTY_DEVELOPER
 
@@ -1314,9 +1288,7 @@ namespace FrostyCmd
             CreateMadden23Profile();
             CreateFifa23Profile();
             CreateDeadSpaceProfile();
-            CreatePGATourProfile();
-            CreateMadden24Profile();
-            CreateEAAntiCheatProfile();
+
 #endif
 
             using (NativeWriter writer = new NativeWriter(new FileStream(@"..\..\..\..\FrostySdk\Profiles.bin", FileMode.Create)))

@@ -393,7 +393,6 @@ namespace FrostySdk
                     case (int)ProfileVersion.DeadSpace:
                     case (int)ProfileVersion.PGATour:
                     case (int)ProfileVersion.Madden24:
-                    case (int)ProfileVersion.EAAntiCheat:
                         return 16;
                     default:
                         return 8;
@@ -573,7 +572,7 @@ namespace FrostySdk
                 ProfileVersion.Madden22, ProfileVersion.Fifa22,
                 ProfileVersion.Battlefield2042, ProfileVersion.Madden23,
                 ProfileVersion.Fifa23, ProfileVersion.NeedForSpeedUnbound,
-                ProfileVersion.PGATour, ProfileVersion.Madden24, ProfileVersion.EAAntiCheat))
+                ProfileVersion.PGATour, ProfileVersion.Madden24))
             {
                 Compress2 = Marshal.GetDelegateForFunctionPointer<CompressFunc2>(Kernel32.GetProcAddress(handle, "OodleLZ_Compress"));
             }
@@ -933,7 +932,7 @@ namespace FrostySdk
         {
             get
             {
-                if (ProfilesLibrary.IsLoaded(ProfileVersion.Fifa18, ProfileVersion.Fifa19, ProfileVersion.Fifa20, ProfileVersion.Fifa21, ProfileVersion.Fifa22, ProfileVersion.Fifa23))
+                if (ProfilesLibrary.IsLoaded(ProfileVersion.Fifa18, ProfileVersion.Fifa19, ProfileVersion.Fifa20, ProfileVersion.Fifa21, ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Madden24))
                     return 0x40000;
                 return 0x10000;
             }
@@ -958,7 +957,7 @@ namespace FrostySdk
                          ProfileVersion.Battlefield5, ProfileVersion.StarWarsSquadrons,
                          ProfileVersion.Fifa21, ProfileVersion.Madden22,
                          ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Madden23,
-                         ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24, ProfileVersion.EAAntiCheat))
+                         ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24))
                 {
                     compressionType = CompressionType.ZStd;
                 }
@@ -1170,7 +1169,7 @@ namespace FrostySdk
             if (ProfilesLibrary.IsLoaded(ProfileVersion.Anthem, ProfileVersion.Fifa19,
                 ProfileVersion.Fifa20, ProfileVersion.NeedForSpeedHeat,
                 ProfileVersion.PlantsVsZombiesBattleforNeighborville, ProfileVersion.Madden22,
-                ProfileVersion.Madden23, ProfileVersion.PGATour, ProfileVersion.Madden24, ProfileVersion.EAAntiCheat))
+                ProfileVersion.Madden23, ProfileVersion.PGATour, ProfileVersion.Madden24))
             {
                 // Kraken
                 compressCode = 0x1170;

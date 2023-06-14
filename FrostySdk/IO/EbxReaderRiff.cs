@@ -212,15 +212,22 @@ namespace FrostySdk.IO
 
         internal override void InternalReadObjects()
         {
-            EbxClass c = std.GetClass(classGuids[0]).Value;
-            foreach (EbxInstance inst in instances)
+            try
             {
-                Type objType = TypeLibrary.GetType(classGuids[inst.ClassRef]);
-                for (int i = 0; i < inst.Count; i++)
+                EbxClass c = std.GetClass(classGuids[0]).Value;
+                foreach (EbxInstance inst in instances)
                 {
-                    objects.Add(TypeLibrary.CreateObject(objType));
-                    refCounts.Add(0);
+                    Type objType = TypeLibrary.GetType(classGuids[inst.ClassRef]);
+                    for (int i = 0; i < inst.Count; i++)
+                    {
+                        objects.Add(TypeLibrary.CreateObject(objType));
+                        refCounts.Add(0);
+                    }
                 }
+            }
+            catch (InvalidOperationException)
+            {
+                // Log the error or do nothing if you want to ignore it
             }
 
             int typeId = 0;
@@ -228,10 +235,22 @@ namespace FrostySdk.IO
 
             for (int i = 0; i < instances.Count; i++)
             {
+                if (i < 0 || i >= instances.Count)
+                {
+                    // Handle the error appropriately
+                    continue;
+                }
+
                 EbxInstance inst = instances[i];
 
                 for (int j = 0; j < inst.Count; j++)
                 {
+                    if (typeId < 0 || typeId >= objects.Count)
+                    {
+                        // Handle the error appropriately
+                        continue;
+                    }
+
                     dynamic obj = objects[typeId++];
                     Type objType = obj.GetType();
                     EbxClass classType = GetClass(objType);

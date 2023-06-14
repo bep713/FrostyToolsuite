@@ -1731,7 +1731,7 @@ namespace Frosty.Core.Sdk
                         ProfileVersion.Fifa20, ProfileVersion.Fifa21, ProfileVersion.Madden22,
                         ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Battlefield2042, ProfileVersion.Madden23,
                         ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour,
-                        ProfileVersion.Madden24, ProfileVersion.EAAntiCheat))
+                        ProfileVersion.Madden24))
                     {
                         fieldObj.AddValue("offset", (int)field.DataOffset);
                         fieldObj.AddValue("nameHash", field.NameHash);
@@ -1937,7 +1937,7 @@ namespace Frosty.Core.Sdk
             else if (ProfilesLibrary.IsLoaded(ProfileVersion.Fifa21, ProfileVersion.Madden22,
                 ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Battlefield2042,
                 ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour, 
-                ProfileVersion.Madden24, ProfileVersion.EAAntiCheat))
+                ProfileVersion.Madden24))
             {
                 Namespace = "Frosty.Core.Sdk.Bf2042.";
             }

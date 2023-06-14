@@ -32,7 +32,7 @@ namespace Frosty.Core.Viewport
                 ProfileVersion.Fifa21, ProfileVersion.Madden22,
                 ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Battlefield2042,
                 ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace,
-                ProfileVersion.PGATour, ProfileVersion.Madden24, ProfileVersion.EAAntiCheat))
+                ProfileVersion.PGATour, ProfileVersion.Madden24))
             {
                 TextureParameters = ebxEntry.TextureParameters;
             }
@@ -140,7 +140,7 @@ namespace Frosty.Core.Viewport
                 ProfileVersion.Fifa21, ProfileVersion.Madden22,
                 ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Battlefield2042,
                 ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace,
-                ProfileVersion.PGATour, ProfileVersion.Madden24, ProfileVersion.EAAntiCheat))
+                ProfileVersion.PGATour, ProfileVersion.Madden24))
             {
                 IsLoaded = true;
                 return;
@@ -303,7 +303,7 @@ namespace Frosty.Core.Viewport
                 ProfileVersion.Fifa21, ProfileVersion.Madden22,
                 ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Battlefield2042,
                 ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace,
-                ProfileVersion.PGATour, ProfileVersion.Madden24, ProfileVersion.EAAntiCheat))
+                ProfileVersion.PGATour, ProfileVersion.Madden24))
             {
                 IsLoaded = true;
                 return;

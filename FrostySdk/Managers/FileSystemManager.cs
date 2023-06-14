@@ -296,8 +296,7 @@ namespace FrostySdk
                     ProfileVersion.PlantsVsZombiesBattleforNeighborville, ProfileVersion.NeedForSpeedHeat,
                     ProfileVersion.Fifa21, ProfileVersion.Madden22,
                     ProfileVersion.Fifa22, ProfileVersion.Battlefield2042, ProfileVersion.Fifa23,
-                    ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24,
-                    ProfileVersion.EAAntiCheat))
+                    ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24))
                 {
                     byte[] buffer = initfs.GetValue<byte[]>("encrypted");
                     if (buffer != null)
@@ -556,7 +555,7 @@ namespace FrostySdk
                             ProfileVersion.NeedForSpeedHeat, ProfileVersion.Fifa21,
                             ProfileVersion.Madden22, ProfileVersion.Fifa22, ProfileVersion.Fifa23,
                             ProfileVersion.Battlefield2042, ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound,
-                            ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24, ProfileVersion.EAAntiCheat)))
+                            ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24)))
                         {
                             // BFV needs even non existent catalogs to be in the list for indexing to work
                             if (!ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield5, ProfileVersion.StarWarsSquadrons))
