@@ -1,4 +1,4 @@
-﻿using FrostySdk.IO;
+using FrostySdk.IO;
 using FrostySdk.Managers;
 using System;
 using System.Diagnostics;
@@ -36,16 +36,20 @@ namespace FrostySdk.Resources
 
     public class Texture : Resource, IDisposable
     {
-        public uint FirstMipOffset {
+        public uint FirstMipOffset
+        {
             get => m_compressedMipOffsets[0];
             set => m_compressedMipOffsets[0] = value;
         }
-        public uint SecondMipOffset {
+        public uint SecondMipOffset
+        {
             get => m_compressedMipOffsets[1];
             set => m_compressedMipOffsets[1] = value;
         }
-        public string PixelFormat {
-            get {
+        public string PixelFormat
+        {
+            get
+            {
                 string enumType = "RenderFormat";
                 string retVal = Enum.Parse(TypeLibrary.GetType(enumType), m_pixelFormat.ToString()).ToString();
                 return retVal.Replace(enumType + "_", "");
@@ -55,9 +59,11 @@ namespace FrostySdk.Resources
         public TextureFlags Flags { get; set; }
         public ushort Width { get; private set; }
         public ushort Height { get; private set; }
-        public ushort SliceCount {
+        public ushort SliceCount
+        {
             get => m_sliceCount;
-            set {
+            set
+            {
                 m_sliceCount = value;
                 if (Type == TextureType.TT_2dArray || Type == TextureType.TT_3d)
                 {
@@ -77,7 +83,8 @@ namespace FrostySdk.Resources
         public uint RangeStart { get; set; }
         public uint RangeEnd { get; set; }
         public uint[] Unknown3 { get; } = new uint[4];
-        public Guid ChunkId {
+        public Guid ChunkId
+        {
             get => m_chunkId;
             set => m_chunkId = value;
         }
@@ -136,7 +143,7 @@ namespace FrostySdk.Resources
             Width = reader.ReadUShort();
             Height = reader.ReadUShort();
             Depth = reader.ReadUShort();
-            if (ProfilesLibrary.IsLoaded(ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.NeedForSpeedUnbound))
             {
                 m_sliceCount = reader.ReadByte();
             }
@@ -158,14 +165,13 @@ namespace FrostySdk.Resources
                 reader.ReadByte();
             }
 
-            if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour))
             {
                 Unknown3[0] = reader.ReadUInt();
             }
 
             if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24))
             {
-                // Skip 4 bytes for Madden24 .res file
                 reader.BaseStream.Seek(4, SeekOrigin.Current);
             }
 
@@ -193,7 +199,7 @@ namespace FrostySdk.Resources
 
             AssetNameHash = reader.ReadUInt();
 
-            if (ProfilesLibrary.IsLoaded(ProfileVersion.PlantsVsZombiesGardenWarfare2, ProfileVersion.Madden22, ProfileVersion.Madden23))
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.PlantsVsZombiesGardenWarfare2, ProfileVersion.Madden23))
             {
                 Unknown3[0] = reader.ReadUInt();
             }
@@ -205,14 +211,13 @@ namespace FrostySdk.Resources
                 Unknown3[0] = reader.ReadUInt();
             }
 
-            if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+            if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound))
             {
                 reader.ReadLong();
             }
 
             if (ProfilesLibrary.IsLoaded(ProfileVersion.Madden24))
             {
-                // Skip 12 extra bytes for Madden24 .res file
                 reader.BaseStream.Seek(12, SeekOrigin.Current);
             }
 
@@ -258,7 +263,7 @@ namespace FrostySdk.Resources
                 writer.Write(Height);
                 writer.Write(Depth);
 
-                if (ProfilesLibrary.IsLoaded(ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+                if (ProfilesLibrary.IsLoaded(ProfileVersion.NeedForSpeedUnbound))
                 {
                     writer.Write((byte)0);
                 }
@@ -280,7 +285,7 @@ namespace FrostySdk.Resources
                     writer.Write(MipCount);
                 }
 
-                if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+                if (ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield2042, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour))
                 {
                     writer.Write(Unknown3[0]);
                 }
@@ -321,7 +326,7 @@ namespace FrostySdk.Resources
                     writer.Write(Unknown3[0]);
                 }
 
-                if (ProfilesLibrary.IsLoaded(ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace))
+                if (ProfilesLibrary.IsLoaded(ProfileVersion.NeedForSpeedUnbound))
                 {
                     writer.Write(0);
                 }
