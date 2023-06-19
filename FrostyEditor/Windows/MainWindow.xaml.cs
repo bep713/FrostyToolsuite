@@ -91,14 +91,6 @@ namespace FrostyEditor.Windows
 
             CommandBindings.Add(new CommandBinding(launchGameCmd, launchButton_Click));
 
-            MenuItem optionsMenuItem = new MenuItem()
-            {
-                Header = "Options",
-                Icon = new Image() { Source = new ImageSourceConverter().ConvertFromString("pack://application:,,,/FrostyCore;component/Images/Settings.png") as ImageSource },
-            };
-            optionsMenuItem.Click += optionsMenuItem_Click;
-            ToolsMenuItem.Items.Add(optionsMenuItem);
-            ToolsMenuItem.Items.Add(new Separator());
 
             Bookmarks.BookmarkDb.ContextChanged += BookmarkDb_ContextChanged;
             BookmarkContextPicker.ItemsSource = Bookmarks.BookmarkDb.Contexts.Values;
@@ -1420,6 +1412,13 @@ namespace FrostyEditor.Windows
         private void BookmarkTreeView_MouseDown(object sender, MouseButtonEventArgs e) {
             TreeViewItem treeItem = (TreeViewItem)BookmarkTreeView.ItemContainerGenerator.ContainerFromItem(BookmarkTreeView.SelectedItem);
             if (treeItem != null) treeItem.IsSelected = false;
+        }
+
+        private void OpenColorizer_Click(object sender, RoutedEventArgs e)
+        {
+            FrostbiteColorizer win = new FrostbiteColorizer();
+
+            win.Show();
         }
     }
 }
