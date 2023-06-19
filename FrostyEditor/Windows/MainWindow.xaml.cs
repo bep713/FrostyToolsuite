@@ -265,7 +265,7 @@ namespace FrostyEditor.Windows
                 ProfileVersion.Madden19, ProfileVersion.Fifa19,
                 ProfileVersion.Madden20, ProfileVersion.Fifa20,
                 ProfileVersion.PlantsVsZombiesBattleforNeighborville, ProfileVersion.Fifa21,
-                ProfileVersion.Madden22, ProfileVersion.Fifa22, ProfileVersion.Fifa23,
+                ProfileVersion.Madden22, ProfileVersion.Fifa22,
                 ProfileVersion.Madden23, ProfileVersion.PGATour,
                 ProfileVersion.Madden24))
             {

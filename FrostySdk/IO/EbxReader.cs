@@ -216,7 +216,7 @@ namespace FrostySdk.IO
                 }
             }
         }
-        public object RootObject => objects.Count > 0 ? objects[0] : null;
+        public object RootObject => objects[0];
         public bool IsValid => objects.Count != 0;
         public bool TransientEdit { get; set; }
 

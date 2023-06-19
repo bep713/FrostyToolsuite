@@ -675,7 +675,7 @@ namespace FrostySdk
             {
                 GetErrorCode = Marshal.GetDelegateForFunctionPointer<GetErrorCodeFunc>(Kernel32.GetProcAddress(handle, "ZSTD_getErrorCode"));
                 GetErrorName = Marshal.GetDelegateForFunctionPointer<GetErrorNameFunc>(Kernel32.GetProcAddress(handle, "ZSTD_getErrorName"));
-                if (ProfilesLibrary.IsLoaded(ProfileVersion.Fifa18, ProfileVersion.Fifa19, ProfileVersion.Fifa20, ProfileVersion.Fifa21, ProfileVersion.Fifa22, ProfileVersion.Fifa23))
+                if (ProfilesLibrary.IsLoaded(ProfileVersion.Fifa18, ProfileVersion.Fifa19, ProfileVersion.Fifa20, ProfileVersion.Fifa21, ProfileVersion.Fifa22))
                 {
                     DecompressUsingDict = Marshal.GetDelegateForFunctionPointer<DecompressUsingDictFunc>(Kernel32.GetProcAddress(handle, "ZSTD_decompress_usingDDict"));
                     CreateDigestedDict = Marshal.GetDelegateForFunctionPointer<CreateDigestedDictFunc>(Kernel32.GetProcAddress(handle, "ZSTD_createDDict"));
@@ -932,7 +932,7 @@ namespace FrostySdk
         {
             get
             {
-                if (ProfilesLibrary.IsLoaded(ProfileVersion.Fifa18, ProfileVersion.Fifa19, ProfileVersion.Fifa20, ProfileVersion.Fifa21, ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Madden24))
+                if (ProfilesLibrary.IsLoaded(ProfileVersion.Fifa18, ProfileVersion.Fifa19, ProfileVersion.Fifa20, ProfileVersion.Fifa21, ProfileVersion.Fifa22))
                     return 0x40000;
                 return 0x10000;
             }
@@ -956,7 +956,7 @@ namespace FrostySdk
                          ProfileVersion.Fifa19, ProfileVersion.Fifa20,
                          ProfileVersion.Battlefield5, ProfileVersion.StarWarsSquadrons,
                          ProfileVersion.Fifa21, ProfileVersion.Madden22,
-                         ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Madden23,
+                         ProfileVersion.Fifa22, ProfileVersion.Madden23,
                          ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24))
                 {
                     compressionType = CompressionType.ZStd;
@@ -1175,8 +1175,8 @@ namespace FrostySdk
                 compressCode = 0x1170;
                 size = (ulong)Oodle.Compress2(Oodle.OodleFormat.Kraken, ptr1.AddrOfPinnedObject(), buffer.Length, ptr2.AddrOfPinnedObject(), Oodle.OodleCompressionLevel.Optimal3, Oodle.GetOptions(Oodle.OodleFormat.Kraken, Oodle.OodleCompressionLevel.Optimal3));
             }
-            else if (ProfilesLibrary.IsLoaded(ProfileVersion.Fifa21, ProfileVersion.Fifa22, ProfileVersion.Fifa23,
-                ProfileVersion.NeedForSpeedUnbound))
+            else if (ProfilesLibrary.IsLoaded(ProfileVersion.Fifa21, ProfileVersion.Fifa22,
+                ProfileVersion.NeedForSpeedUnbound, ProfileVersion.PGATour))
             {
                 // Leviathan
                 compressCode = 0x1970;

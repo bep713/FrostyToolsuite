@@ -30,9 +30,8 @@ namespace Frosty.Core.Viewport
                 ProfileVersion.Battlefield5, ProfileVersion.Fifa20,
                 ProfileVersion.PlantsVsZombiesBattleforNeighborville, ProfileVersion.NeedForSpeedHeat,
                 ProfileVersion.Fifa21, ProfileVersion.Madden22,
-                ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Battlefield2042,
-                ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace,
-                ProfileVersion.PGATour, ProfileVersion.Madden24))
+                ProfileVersion.Fifa22, ProfileVersion.Battlefield2042,
+                ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24))
             {
                 TextureParameters = ebxEntry.TextureParameters;
             }
@@ -138,9 +137,8 @@ namespace Frosty.Core.Viewport
                 ProfileVersion.Fifa20, ProfileVersion.PlantsVsZombiesBattleforNeighborville,
                 ProfileVersion.NeedForSpeedHeat,
                 ProfileVersion.Fifa21, ProfileVersion.Madden22,
-                ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Battlefield2042,
-                ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace,
-                ProfileVersion.PGATour, ProfileVersion.Madden24))
+                ProfileVersion.Fifa22, ProfileVersion.Battlefield2042,
+                ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24))
             {
                 IsLoaded = true;
                 return;
@@ -301,9 +299,8 @@ namespace Frosty.Core.Viewport
                 ProfileVersion.Fifa20, ProfileVersion.PlantsVsZombiesBattleforNeighborville,
                 ProfileVersion.NeedForSpeedHeat,
                 ProfileVersion.Fifa21, ProfileVersion.Madden22,
-                ProfileVersion.Fifa22, ProfileVersion.Fifa23, ProfileVersion.Battlefield2042,
-                ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace,
-                ProfileVersion.PGATour, ProfileVersion.Madden24))
+                ProfileVersion.Fifa22, ProfileVersion.Battlefield2042,
+                ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24))
             {
                 IsLoaded = true;
                 return;

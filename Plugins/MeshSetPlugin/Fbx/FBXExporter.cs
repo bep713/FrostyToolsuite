@@ -376,7 +376,7 @@ namespace MeshSetPlugin
 
             if (ProfilesLibrary.IsLoaded(ProfileVersion.StarWarsBattlefrontII, ProfileVersion.Battlefield5,
                 ProfileVersion.PlantsVsZombiesBattleforNeighborville, ProfileVersion.StarWarsSquadrons,
-                ProfileVersion.Madden22, ProfileVersion.Fifa22, ProfileVersion.Fifa23,
+                ProfileVersion.Madden22, ProfileVersion.Fifa22,
                 ProfileVersion.Battlefield2042, ProfileVersion.Madden23,
                 ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace,
                 ProfileVersion.PGATour, ProfileVersion.Madden24) && meshAsset != null)

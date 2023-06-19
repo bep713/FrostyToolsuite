@@ -32,7 +32,6 @@ using System.Windows;
 [assembly: PluginValidForProfile((int)ProfileVersion.Fifa20)]
 [assembly: PluginValidForProfile((int)ProfileVersion.Fifa21)]
 [assembly: PluginValidForProfile((int)ProfileVersion.Fifa22)]
-[assembly: PluginValidForProfile((int)ProfileVersion.Fifa23)]
 [assembly: PluginValidForProfile((int)ProfileVersion.PGATour)]
 
 [assembly: RegisterLocalizedStringDatabase(typeof(LegacyLocalizedStringDatabase))]

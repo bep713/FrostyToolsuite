@@ -295,8 +295,9 @@ namespace FrostySdk
                     ProfileVersion.Anthem, ProfileVersion.Fifa20,
                     ProfileVersion.PlantsVsZombiesBattleforNeighborville, ProfileVersion.NeedForSpeedHeat,
                     ProfileVersion.Fifa21, ProfileVersion.Madden22,
-                    ProfileVersion.Fifa22, ProfileVersion.Battlefield2042, ProfileVersion.Fifa23,
-                    ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24))
+                    ProfileVersion.Fifa22, ProfileVersion.Battlefield2042,
+                    ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound,
+                    ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24))
                 {
                     byte[] buffer = initfs.GetValue<byte[]>("encrypted");
                     if (buffer != null)
@@ -370,7 +371,7 @@ namespace FrostySdk
 
                     DbObject initfs = reader.ReadDbObject();
                     if (ProfilesLibrary.DataVersion == (int)ProfileVersion.Fifa18 || ProfilesLibrary.DataVersion == (int)ProfileVersion.Fifa19 || ProfilesLibrary.DataVersion == (int)ProfileVersion.Anthem || ProfilesLibrary.DataVersion == (int)ProfileVersion.Anthem || ProfilesLibrary.DataVersion == (int)ProfileVersion.Fifa20
-                     || ProfilesLibrary.DataVersion == (int)ProfileVersion.PlantsVsZombiesBattleforNeighborville || ProfilesLibrary.DataVersion == (int)ProfileVersion.NeedForSpeedHeat || ProfilesLibrary.DataVersion == (int)ProfileVersion.Madden22 || ProfilesLibrary.DataVersion == (int)ProfileVersion.PGATour
+                     || ProfilesLibrary.DataVersion == (int)ProfileVersion.PlantsVsZombiesBattleforNeighborville || ProfilesLibrary.DataVersion == (int)ProfileVersion.NeedForSpeedHeat
                         )
                     {
                         encrypted = true;
@@ -553,9 +554,10 @@ namespace FrostySdk
                         if ((!installChunk.HasValue("files") || installChunk.GetValue<DbObject>("files").Count == 0) &&
                             (!ProfilesLibrary.IsLoaded(ProfileVersion.Anthem, ProfileVersion.PlantsVsZombiesBattleforNeighborville,
                             ProfileVersion.NeedForSpeedHeat, ProfileVersion.Fifa21,
-                            ProfileVersion.Madden22, ProfileVersion.Fifa22, ProfileVersion.Fifa23,
-                            ProfileVersion.Battlefield2042, ProfileVersion.Madden23, ProfileVersion.NeedForSpeedUnbound,
-                            ProfileVersion.DeadSpace, ProfileVersion.PGATour, ProfileVersion.Madden24)))
+                            ProfileVersion.Madden22, ProfileVersion.Fifa22,
+                            ProfileVersion.Battlefield2042, ProfileVersion.Madden23,
+                            ProfileVersion.NeedForSpeedUnbound, ProfileVersion.DeadSpace,
+                            ProfileVersion.PGATour, ProfileVersion.Madden24)))
                         {
                             // BFV needs even non existent catalogs to be in the list for indexing to work
                             if (!ProfilesLibrary.IsLoaded(ProfileVersion.Battlefield5, ProfileVersion.StarWarsSquadrons))

@@ -1706,16 +1706,24 @@ namespace FrostySdk.IO
 
         private int AddClass(string name, Type classType, bool addSignature = true)
         {
-            Guid classGuid = classType.GetCustomAttribute<GuidAttribute>().Guid;
-            m_classGuids.Add(classGuid);
+            GuidAttribute[] guidAttributes = classType.GetCustomAttributes<GuidAttribute>().ToArray();
+            if (guidAttributes.Length > 0)
+            {
+                Guid classGuid = guidAttributes[0].Guid; // Choose the first GuidAttribute
+                m_classGuids.Add(classGuid);
+            }
 
             EbxClass ebxClass = GetClass(classType);
             m_classTypes.Add(ebxClass);
 
             if (addSignature)
             {
-                Guid tiGuid = classType.GetCustomAttribute<TypeInfoGuidAttribute>().Guid;
-                m_classSignatures.Add(BitConverter.ToUInt32(tiGuid.ToByteArray(), 12));
+                TypeInfoGuidAttribute[] tiGuidAttributes = classType.GetCustomAttributes<TypeInfoGuidAttribute>().ToArray();
+                if (tiGuidAttributes.Length > 0)
+                {
+                    Guid tiGuid = tiGuidAttributes[0].Guid; // Choose the first TypeInfoGuidAttribute
+                    m_classSignatures.Add(BitConverter.ToUInt32(tiGuid.ToByteArray(), 12));
+                }
             }
 
             AddTypeName(name);
