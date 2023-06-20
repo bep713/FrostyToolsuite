@@ -202,6 +202,8 @@ namespace FrostySdk.Managers
                 IAssetLoader loader = (IAssetLoader)Activator.CreateInstance(ProfilesLibrary.AssetLoader);
                 loader.Load(this, helper);
 
+                RemoveGameSpecificEbxs();
+
                 // write any patched sb data to cache
                 helper.WriteToCache(this);
 
@@ -327,6 +329,14 @@ namespace FrostySdk.Managers
                     WriteToLog("Loading type info");
                     TypeLibrary.Reflection.LoadClassInfoAssets(this);
                 }
+            }
+        }
+
+        public void RemoveGameSpecificEbxs()
+        {
+            if (ProfilesLibrary.DataVersion == (int)ProfileVersion.Madden24)
+            {
+                m_ebxList = m_ebxList.Where(e => !e.Key.StartsWith("virtual")).ToDictionary(e => e.Key, e => e.Value);
             }
         }
 
