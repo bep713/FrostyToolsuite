@@ -1718,12 +1718,8 @@ namespace FrostySdk.IO
 
             if (addSignature)
             {
-                TypeInfoGuidAttribute[] tiGuidAttributes = classType.GetCustomAttributes<TypeInfoGuidAttribute>().ToArray();
-                if (tiGuidAttributes.Length > 0)
-                {
-                    Guid tiGuid = tiGuidAttributes[0].Guid; // Choose the first TypeInfoGuidAttribute
-                    m_classSignatures.Add(BitConverter.ToUInt32(tiGuid.ToByteArray(), 12));
-                }
+                Guid tiGuid = classType.GetCustomAttributes<TypeInfoGuidAttribute>().LastOrDefault().Guid;
+                m_classSignatures.Add(BitConverter.ToUInt32(tiGuid.ToByteArray(), 12));
             }
 
             AddTypeName(name);
@@ -1759,7 +1755,11 @@ namespace FrostySdk.IO
         internal EbxClass GetClass(Type objType)
         {
             EbxClass? classType = null;
-            foreach (TypeInfoGuidAttribute attr in objType.GetCustomAttributes<TypeInfoGuidAttribute>())
+            // reversing the type info guids. There are sometimes 2 type info guids
+            //  - class guid
+            //  - type info guid
+            // Need to get the type info guid first to reference patch data in M24.
+            foreach (TypeInfoGuidAttribute attr in objType.GetCustomAttributes<TypeInfoGuidAttribute>().Reverse())
             {
                 if (classType == null)
                     classType = GetClass(attr.Guid);
